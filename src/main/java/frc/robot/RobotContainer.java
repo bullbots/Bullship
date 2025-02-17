@@ -38,7 +38,7 @@ public class RobotContainer
   // Replace with CommandPS4Controller or CommandJoystick if needed
   final         CommandXboxController driverXbox = new CommandXboxController(0);
   // The robot's subsystems and commands are defined here...
-  private Robot m_Robot;
+  private SwerveSubsystem m_swerveSubsystem;
   private final SwerveSubsystem       drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                                 "swerve/hybrid"));
 
@@ -155,11 +155,11 @@ public class RobotContainer
       driverXbox.x().onTrue(Commands.defer(() -> {
         //i'm not sure if this is the best way to do this but it should work
         System.out.println("x pressed()");
-        if(m_Robot.seesAprilTag()){
+        if(m_swerveSubsystem.seesAprilTag()){
           
           // var cur_pose = drivebase.getPose();
           // System.out.printf("pose: %s%n", cur_pose);
-          drivebase.resetOdometry(m_Robot.getBlueBotPoseEstimate());
+          drivebase.resetOdometry(m_swerveSubsystem.getBlueBotPoseEstimate());
           // cur_pose = drivebase.getPose();
           // System.out.printf("pose: %s%n", cur_pose);
 

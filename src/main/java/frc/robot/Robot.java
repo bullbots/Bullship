@@ -35,15 +35,7 @@ public class Robot extends TimedRobot
   private Timer disabledTimer;
 
   private int counter = 0;
-  private SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(new Translation2d(11.5,14)); //not sure if this is right
-  private Rotation2d m_gyro = new Rotation2d();
-  private SwerveModulePosition[] m_modulePositions = {
-    new SwerveModulePosition(), 
-    new SwerveModulePosition(), 
-    new SwerveModulePosition(), 
-    new SwerveModulePosition()
-  }; // WRONG POSITIONS, NEED TO BE FIXED
-  private SwerveDrivePoseEstimator m_poseEstimator = new SwerveDrivePoseEstimator(m_kinematics, m_gyro, m_modulePositions, new Pose2d()); //not sure what to do for the last Pose2d
+
 
   public Robot()
   {
@@ -90,20 +82,7 @@ public class Robot extends TimedRobot
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
-    LimelightHelpers.SetRobotOrientation("limelight", m_poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
-    LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
-     boolean doRejectUpdate = false; 
-      if(mt2.tagCount == 0)
-      {
-        doRejectUpdate = true;
-      }
-      if(!doRejectUpdate)
-      {
-        m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7,.7,9999999));
-        m_poseEstimator.addVisionMeasurement(
-            mt2.pose,
-            mt2.timestampSeconds);
-      }
+    
     // counter ++;
     // if(counter % 10 == 0) {
     //   counter = 0;
@@ -214,12 +193,5 @@ public class Robot extends TimedRobot
   public void simulationPeriodic()
   {
   }
-  public Pose2d getBlueBotPoseEstimate(){
-    //replace void with correct var
-    return m_poseEstimator.getEstimatedPosition();
-  }
-  public boolean seesAprilTag(){
-    LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
-    return mt2.tagCount !=0;
-  }
+
 }
