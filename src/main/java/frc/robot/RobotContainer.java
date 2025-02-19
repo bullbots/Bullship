@@ -10,6 +10,7 @@ import com.pathplanner.lib.path.PathConstraints;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -158,25 +159,24 @@ public class RobotContainer
           
           // var cur_pose = drivebase.getPose();
           // System.out.printf("pose: %s%n", cur_pose);
-          drivebase.resetOdometry(drivebase.getBlueBotPoseEstimate());
+          var poseEstimate = drivebase.getBlueBotPoseEstimate();
+          drivebase.resetOdometry(poseEstimate);
           // cur_pose = drivebase.getPose();
-          // System.out.printf("pose: %s%n", cur_pose);
+          System.out.printf("poseEstimate: %s%n", poseEstimate);
 
           PathConstraints constraints = new PathConstraints(
-          drivebase.getSwerveDrive().getMaximumChassisVelocity(), 4.0,
+          drivebase.getSwerveDrive().getMaximumChassisVelocity()*.25, 4.0,
           drivebase.getSwerveDrive().getMaximumChassisAngularVelocity(), Units.degreesToRadians(720));
 
           var targetPose = LimelightHelpers.getTargetPose_RobotSpace("limelight");
-          
-          System.out.printf("target x: %f target z: %f%n", targetPose[0], targetPose[2]);
-
-          Pose2d pose = new Pose2d(5, 5, Rotation2d.fromDegrees(60));
+          System.out.printf("target x: %f target z: %f%n", targetPose[0], targetPose[1]);
+          Pose2d pose = poseEstimate.plus(new Transform2d(-targetPose[0], -targetPose[1], Rotation2d.fromDegrees(60)));
 
           return AutoBuilder.pathfindToPose(pose, constraints);
         }
         else{
           System.out.println("no AprilTag Visible");
-          return null; //not sure if this will work or if you need to return something else
+          return null;
         }
       }, Set.of(drivebase)));
       driverXbox.b().whileTrue(
