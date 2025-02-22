@@ -9,6 +9,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.path.PathConstraints;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -25,6 +26,8 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
 import java.util.Set;
+
+import org.dyn4j.geometry.Rotatable;
 
 import swervelib.SwerveInputStream;
 
@@ -48,10 +51,10 @@ public class RobotContainer
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(),
                                                                 () -> driverXbox.getLeftY() * -1,
                                                                 () -> driverXbox.getLeftX() * -1)
-                                                            .withControllerRotationAxis(() -> driverXbox.getRightX() * -1)
+                                                            .withControllerRotationAxis(() -> driverXbox.getRightX() * 1)
                                                             .deadband(OperatorConstants.DEADBAND)
                                                             .scaleTranslation(0.8)
-                                                            .allianceRelativeControl(false);
+                                                            .allianceRelativeControl(true);
 
   /**
    * Clone's the angular velocity input stream and converts it to a fieldRelative input stream.
@@ -167,11 +170,33 @@ public class RobotContainer
           PathConstraints constraints = new PathConstraints(
           drivebase.getSwerveDrive().getMaximumChassisVelocity()*.25, 4.0,
           drivebase.getSwerveDrive().getMaximumChassisAngularVelocity(), Units.degreesToRadians(720));
+          
+          // var targetPose = LimelightHelpers.getTargetPose_RobotSpace("limelight");
+          // var results = LimelightHelpers.getLatestResults("limelight");
+          // var fiducials = results.targets_Classifier;
 
-          var targetPose = LimelightHelpers.getTargetPose_RobotSpace("limelight");
-          System.out.printf("target x: %f target z: %f%n", targetPose[0], targetPose[1]);
-          Pose2d pose = poseEstimate.plus(new Transform2d(-targetPose[0], -targetPose[1], Rotation2d.fromDegrees(60)));
+          var id = LimelightHelpers.getFiducialID("limelight");
 
+          var aprilTagPose = drivebase.getAprilTagPose((int) id);
+
+          Pose2d aprilTag2d = new Pose2d(aprilTagPose.get().getX(), aprilTagPose.get().getY(), aprilTagPose.get().getRotation().toRotation2d());
+          
+          Pose2d convertedTag2d = aprilTag2d.rotateAround(aprilTag2d.getTranslation(), aprilTag2d.getRotation());
+
+          Pose2d convertedTag2d2 = convertedTag2d.transformBy(new Transform2d(0.356 * 3, 0, new Rotation2d(0)));
+
+          Pose2d finalPose = convertedTag2d2.rotateAround(aprilTag2d.getTranslation(), aprilTag2d.getRotation().times(-1));
+
+
+          // Rotation2d aprilTagRotation = aprilTagPose.get().getRotation().toRotation2d();
+          // var aprilTagVector = aprilTagPose.
+
+          Pose2d pose = new Pose2d(finalPose.getX(), finalPose.getY(), finalPose.getRotation().rotateBy(Rotation2d.fromDegrees(180)));
+
+          // var pose2d = fiducials[0].getTargetPose_RobotSpace2D();
+          // var poseRot = pose2d.rotateBy(poseEstimate.getRotation().times(-1));
+          // System.out.printf("target x: %f target z: %f%n", pose2d.getX(), pose2d.getY());  
+          // Pose2d pose = poseEstimate.plus(new Transform2d(poseRot.getX(), poseRot.getY(), Rotation2d.fromDegrees(60)));
           return AutoBuilder.pathfindToPose(pose, constraints);
         }
         else{

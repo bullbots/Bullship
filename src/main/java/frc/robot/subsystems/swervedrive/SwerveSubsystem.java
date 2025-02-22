@@ -68,7 +68,7 @@ public class SwerveSubsystem extends SubsystemBase
   /**
    * AprilTag field layout.
    */
-  private final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+  private final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
   /**
    * Enable vision odometry updates while driving.
    */
@@ -758,5 +758,8 @@ public class SwerveSubsystem extends SubsystemBase
   public boolean seesAprilTag(){
     LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
     return mt2.tagCount !=0;
+  }
+  public Optional<Pose3d> getAprilTagPose(int ID) {
+      return aprilTagFieldLayout.getTagPose(ID);
   }
 }
