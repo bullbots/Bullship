@@ -203,7 +203,8 @@ public class SwerveSubsystem extends SubsystemBase
                                );
             } else
             {
-              swerveDrive.setChassisSpeeds(speedsRobotRelative);
+              // swerveDrive.setChassisSpeeds(speedsRobotRelative);
+              swerveDrive.drive(speedsRobotRelative);
             }
           },
           // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
@@ -511,6 +512,9 @@ public class SwerveSubsystem extends SubsystemBase
   {
     return run(() -> {
       swerveDrive.driveFieldOriented(velocity.get());
+      // swerveDrive.driveFieldOriented(velocity.get(),
+      // var robotVelocity = ChassisSpeeds.fromFieldRelativeSpeeds(velocity.get(), swerveDrive.getOdometryHeading());
+      // swerveDrive.drive(robotVelocity, true, new Translation2d()); 
     });
   }
 

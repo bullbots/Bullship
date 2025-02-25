@@ -51,7 +51,7 @@ public class RobotContainer
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(),
                                                                 () -> driverXbox.getLeftY() * -1,
                                                                 () -> driverXbox.getLeftX() * -1)
-                                                            .withControllerRotationAxis(() -> driverXbox.getRightX() * 1)
+                                                            .withControllerRotationAxis(() -> driverXbox.getRightX() * -1)
                                                             .deadband(OperatorConstants.DEADBAND)
                                                             .scaleTranslation(0.8)
                                                             .allianceRelativeControl(true);
@@ -119,6 +119,7 @@ public class RobotContainer
     Command driveFieldOrientedDirectAngle      = drivebase.driveFieldOriented(driveDirectAngle);
     Command driveFieldOrientedAnglularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
     Command driveRobotOrientedAngularVelocity  = drivebase.driveFieldOriented(driveRobotOriented);
+    // swerveDrive.setChassisSpeeds(speedsRobotRelative)
     Command driveSetpointGen = drivebase.driveWithSetpointGeneratorFieldRelative(
         driveDirectAngle);
     Command driveFieldOrientedDirectAngleKeyboard      = drivebase.driveFieldOriented(driveDirectAngleKeyboard);
@@ -128,7 +129,7 @@ public class RobotContainer
 
     if (RobotBase.isSimulation())
     {
-      drivebase.setDefaultCommand(driveFieldOrientedDirectAngleKeyboard);
+      drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
     } else
     {
       drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
@@ -163,7 +164,7 @@ public class RobotContainer
           // var cur_pose = drivebase.getPose();
           // System.out.printf("pose: %s%n", cur_pose);
           var poseEstimate = drivebase.getBlueBotPoseEstimate();
-          drivebase.resetOdometry(poseEstimate);
+          // drivebase.resetOdometry(poseEstimate);
           // cur_pose = drivebase.getPose();
           System.out.printf("poseEstimate: %s%n", poseEstimate);
 
@@ -183,7 +184,7 @@ public class RobotContainer
           
           Pose2d convertedTag2d = aprilTag2d.rotateAround(aprilTag2d.getTranslation(), aprilTag2d.getRotation());
 
-          Pose2d convertedTag2d2 = convertedTag2d.transformBy(new Transform2d(0.356 * 3, 0, new Rotation2d(0)));
+          Pose2d convertedTag2d2 = convertedTag2d.transformBy(new Transform2d(0.356, 0, new Rotation2d(0)));
 
           Pose2d finalPose = convertedTag2d2.rotateAround(aprilTag2d.getTranslation(), aprilTag2d.getRotation().times(-1));
 
