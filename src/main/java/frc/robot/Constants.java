@@ -27,11 +27,20 @@ public final class Constants
 
   //IDs
   public final class Motors{
-  
+    public static final int FRONT_LEFT = 3;
+    public static final int FRONT_RIGHT = 4;
+    public static final int BACK_LEFT = 2;
+    public static final int BACK_RIGHT = 1;
     public static final int ELEVATOR_LEFT = 5;
     public static final int ELEVATOR_RIGHT = 6;
+    public static final int CORAL_MOTOR = 7;
+    public static final int ALGAE_LEFT = 8;
+    public static final int ALGAE_RIGHT = 9;
+    public static final int LIFT_MOTOR = 10;
   
   }
+  //not real numbers
+    public static final double[] LiftLevelOffsets = {0,1,2,3,4};
 
 
 //  public static final class AutonConstants
