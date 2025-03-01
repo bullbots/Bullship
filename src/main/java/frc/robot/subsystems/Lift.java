@@ -1,4 +1,4 @@
-package frc.robot.subsystems.swervedrive;
+package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix6.StatusCode;
@@ -103,8 +103,6 @@ public class Lift extends SubsystemBase{
         //im not sure if this is correct
         m_LeftLiftMotor.setPosition(Constants.LiftLevelOffsets[level-1]);
         m_RightLiftMotor.setPosition(Constants.LiftLevelOffsets[level-1]);
-        
-
     }
     
 
