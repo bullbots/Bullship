@@ -16,9 +16,16 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
+<<<<<<< Updated upstream
+=======
+import frc.robot.commands.MoveLift;
+import frc.robot.subsystems.BreadboardMotor;
+import frc.robot.subsystems.Lift;
+>>>>>>> Stashed changes
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
 import swervelib.SwerveInputStream;
@@ -35,7 +42,14 @@ public class RobotContainer
   final         CommandXboxController driverXbox = new CommandXboxController(0);
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem       drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
+<<<<<<< Updated upstream
                                                                                 "swerve/neo"));
+=======
+                                                                                "swerve/hybrid"));
+  public static final Lift lift = new Lift();
+  public final BreadboardMotor breadboardMotor = new BreadboardMotor();
+
+>>>>>>> Stashed changes
 
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
@@ -173,7 +187,16 @@ public class RobotContainer
           drivebase.driveToPose(
               new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
                               );
+<<<<<<< Updated upstream
       driverXbox.start().whileTrue(Commands.none());
+=======
+      driverXbox.leftBumper().onTrue(new MoveLift(lift, 1));
+      driverXbox.rightBumper().onTrue(new MoveLift(lift, 2));
+
+      // driverXbox.start().whileTrue(Commands.none());
+
+      driverXbox.start().onTrue(Commands.runOnce(breadboardMotor::driveToPosition, breadboardMotor));
+>>>>>>> Stashed changes
       driverXbox.back().whileTrue(Commands.none());
       driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
       driverXbox.rightBumper().onTrue(Commands.none());
