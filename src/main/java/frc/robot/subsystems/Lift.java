@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
-import com.ctre.phoenix6.CANBus;
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
@@ -97,8 +98,8 @@ public class Lift extends SubsystemBase{
     }
     public void MoveToLevel(int level){
         //im not sure if this is correct
-        liftLeader.setPosition(Constants.LiftLevelOffsets[level-1]);
-    
+        m_LeftLiftMotor.setPosition(Constants.LiftLevelOffsets[level-1]);
+        m_RightLiftMotor.setPosition(Constants.LiftLevelOffsets[level-1]);
     }
     
 
