@@ -3,7 +3,7 @@ package frc.robot.commands;
 import com.fasterxml.jackson.databind.ser.std.MapProperty;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.swervedrive.Lift;
+import frc.robot.subsystems.Lift;
 public class MoveLift extends Command{
     
     //THIS IS SET UP FOR HOLDING A BUTTON :thimbs:
