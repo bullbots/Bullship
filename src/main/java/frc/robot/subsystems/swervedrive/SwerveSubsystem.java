@@ -150,11 +150,20 @@ public class SwerveSubsystem extends SubsystemBase
     }
     LimelightHelpers.SetRobotOrientation("limelight", swerveDrive.swerveDrivePoseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
     LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
+
      boolean doRejectUpdate = false; 
       if(mt2.tagCount == 0)
       {
         doRejectUpdate = true;
       }
+
+      // Check if Limelight Estimate is within a meter of current estimate
+
+      if (Math.abs(swerveDrive.getPose().getX() - mt2.pose.getX()) > 1 || Math.abs(swerveDrive.getPose().getY() - mt2.pose.getY()) > 1) {
+        System.out.println("Skipping limelight pose update: Pose not within 1 meter of swerve drive pose estiamte");
+        doRejectUpdate = true;
+      }
+
       if(!doRejectUpdate)
       {
         swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7,.7,9999999));
