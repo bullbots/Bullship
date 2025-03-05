@@ -26,6 +26,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import org.dyn4j.geometry.Rotatable;
 
@@ -204,6 +205,7 @@ public class RobotContainer
           System.out.println("no AprilTag Visible");
           return null;
         }
+
       }, Set.of(drivebase)));
       driverXbox.b().whileTrue(
           drivebase.driveToPose(
