@@ -15,7 +15,7 @@ import frc.robot.Constants;
 public class Lift extends SubsystemBase{
     //private final TalonFX m_LeftLiftMotor;
     //private final TalonFX m_RightLiftMotor;
-    private final CANBus kCANBus = new CANBus("canivore");
+    //private final CANBus kCANBus = new CANBus("canivore");
     private final TalonFX liftLeader;
     private final TalonFX liftFollower;
     
@@ -98,8 +98,8 @@ public class Lift extends SubsystemBase{
     }
     public void MoveToLevel(int level){
         //im not sure if this is correct
-        m_LeftLiftMotor.setPosition(Constants.LiftLevelOffsets[level-1]);
-        m_RightLiftMotor.setPosition(Constants.LiftLevelOffsets[level-1]);
+        //m_LeftLiftMotor.setPosition(Constants.LiftLevelOffsets[level-1]);
+        //m_RightLiftMotor.setPosition(Constants.LiftLevelOffsets[level-1]);
     }
     
 
