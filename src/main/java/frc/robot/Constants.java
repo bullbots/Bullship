@@ -27,16 +27,24 @@ public final class Constants
 
   //IDs
   public final class Motors{
-    public static final int FRONT_LEFT = 3;
-    public static final int FRONT_RIGHT = 4;
-    public static final int BACK_LEFT = 2;
-    public static final int BACK_RIGHT = 1;
-    public static final int ELEVATOR_LEFT = 5;
-    public static final int ELEVATOR_RIGHT = 6;
-    public static final int CORAL_MOTOR = 7;
-    public static final int ALGAE_LEFT = 8;
-    public static final int ALGAE_RIGHT = 9;
-    public static final int LIFT_MOTOR = 10;
+
+    public static final int BACK_RIGHT_DRIVE = 1;
+    public static final int BACK_RIGHT_SWERVE = 2;
+    
+    public static final int BACK_LEFT_DRIVE = 3;
+    public static final int BACK_LEFT_SWERVE = 4;
+    
+    public static final int FRONT_RIGHT_DRIVE = 5;
+    public static final int FRONT_RIGHT_SWERVE = 6;
+    
+    public static final int FRONT_LEFT_DRIVE = 7;
+    public static final int FRONT_LEFT_SWERVE = 8;
+    
+    public static final int ELEVATOR = 9;
+    public static final int CORAL_MOTOR = 10;
+    public static final int ALGAE_LEFT = 11;
+    public static final int ALGAE_RIGHT = 12;
+    public static final int LIFT_MOTOR = 13;
   
   }
   //not real numbers
