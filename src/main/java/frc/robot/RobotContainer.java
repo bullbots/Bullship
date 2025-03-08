@@ -10,16 +10,20 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.MoveElevator;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
+
 import swervelib.SwerveInputStream;
 
 /**
@@ -32,10 +36,17 @@ public class RobotContainer
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   public final static         CommandXboxController driverXbox = new CommandXboxController(0);
+  public final static Joystick buttonBox = new Joystick(1);
+  private JoystickButton elevator1Button = new JoystickButton(buttonBox, 3);
+  private JoystickButton elevator2Button = new JoystickButton(buttonBox, 2);
+  private JoystickButton elevator3Button = new JoystickButton(buttonBox, 1);
+  private JoystickButton elevator4Button = new JoystickButton(buttonBox, 0);
+
+
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem       drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                                 "swerve/hybrid"));
-  public static final Elevator lift = new Elevator();
+  public static final Elevator elevator = new Elevator();
 
 
   /**
@@ -132,7 +143,6 @@ public class RobotContainer
     {
       driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
       driverXbox.y().whileTrue(drivebase.sysIdDriveMotorCommand());
-
     }
     if (DriverStation.isTest())
     {
@@ -146,14 +156,27 @@ public class RobotContainer
       driverXbox.rightBumper().onTrue(Commands.none());
     } else
     {
+      elevator1Button.onTrue(new InstantCommand(() -> {System.out.println("Button 1 Pressed");}));
+      elevator2Button.onTrue(new InstantCommand(() -> {System.out.println("Button 2 Pressed");}));
+      elevator3Button.onTrue(new InstantCommand(() -> {System.out.println("Button 3 Pressed");}));
+      elevator4Button.onTrue(new InstantCommand(() -> {System.out.println("Button 4 Pressed");}));
+
+      //uncomment this when we are actually ready to try the elevator
+
+      // elevator1Button.onTrue(new MoveElevator(elevator, 1));
+      // elevator2Button.onTrue(new MoveElevator(elevator, 2));
+      // elevator3Button.onTrue(new MoveElevator(elevator, 3));
+      // elevator4Button.onTrue(new MoveElevator(elevator, 4));
+
+
       driverXbox.a().onTrue((Commands.print("drivebase::zeroGyro").andThen(drivebase::zeroGyro)));
       driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
       driverXbox.b().whileTrue(
           drivebase.driveToPose(
               new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
                               );
-      driverXbox.leftBumper().onTrue(new MoveElevator(lift, 1));
-      driverXbox.rightBumper().onTrue(new MoveElevator(lift, 2));
+      driverXbox.leftBumper().onTrue(new MoveElevator(elevator, 1));
+      driverXbox.rightBumper().onTrue(new MoveElevator(elevator, 2));
 
       driverXbox.start().whileTrue(Commands.none());
       driverXbox.back().whileTrue(Commands.none());
