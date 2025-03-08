@@ -3,16 +3,16 @@ package frc.robot.commands;
 import com.fasterxml.jackson.databind.ser.std.MapProperty;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Lift;
-public class MoveLift extends Command{
+import frc.robot.subsystems.Elevator;
+public class MoveElevator extends Command{
     
     //THIS IS SET UP FOR HOLDING A BUTTON :thimbs:
     //untested
-    private final Lift m_ElevatorSubsystem;
+    private final Elevator m_ElevatorSubsystem;
     private int m_level;
 
     
-    public MoveLift(Lift elevator, int level){
+    public MoveElevator(Elevator elevator, int level){
         m_ElevatorSubsystem = elevator;
         m_level = level;
 
