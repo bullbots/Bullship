@@ -104,7 +104,7 @@ public class Elevator extends SubsystemBase{
     public void periodic() {
         var elevatorEncoder = m_elevatorMotor.getPosition().getValueAsDouble();
         SmartDashboard.putNumber("Elevator Encoder", elevatorEncoder);
-        
+        SmartDashboard.putNumber("Elevator Currant", m_elevatorMotor.getSupplyCurrent().getValueAsDouble());
     }
     
 
