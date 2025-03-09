@@ -97,7 +97,7 @@ public class Elevator extends SubsystemBase{
         
         System.out.println("Elevator.MoveToLevel()");
         m_elevatorMotor.setControl(m_mmReq.withPosition(Constants.ElevatorLevelOffsets[level]).withSlot(0));
-        m_elevatorMotor.setControl(m_mmReq.withPosition(2.97).withSlot(0));
+        //m_elevatorMotor.setControl(m_mmReq.withPosition(2.97).withSlot(0));
     }
 
     @Override

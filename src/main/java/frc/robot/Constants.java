@@ -48,8 +48,8 @@ public final class Constants
     public static final int LIFT_MOTOR = 13;
   
   }
-  //not real numbers
-    public static final double[] ElevatorLevelOffsets = {0.71, 1.61, 2.97,5.41 };
+    //Coral positions
+    public static final double[] ElevatorLevelOffsets = {0, 1.23, 2.01, 3.58,5.83 };
 
 
 //  public static final class AutonConstants

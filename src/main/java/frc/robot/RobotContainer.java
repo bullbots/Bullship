@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Coral.ShootCoral;
 import frc.robot.commands.Coral.IntakeCoral;
-import frc.robot.commands.Elevator.MoveElevator;
+import frc.robot.commands.Elevator.MoveElevatorToPos;
 import frc.robot.commands.Elevator.MoveElevatorUP;
 import frc.robot.subsystems.Coral;
 import frc.robot.subsystems.Elevator;
@@ -173,11 +173,11 @@ public class RobotContainer
       // driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
       // driverXbox.rightBumper().onTrue(Commands.none());
 
-      m_buttonBox.button(1).onTrue(new MoveElevator(elevator,1));
-      m_buttonBox.button(2).onTrue(new MoveElevator(elevator,2));
-      m_buttonBox.button(3).onTrue(new MoveElevator(elevator,3));
-      m_buttonBox.button(4).onTrue(new MoveElevator(elevator,4));
-      //m_buttonBox.button(7).onTrue(new MoveElevator(elevator,4));
+      m_buttonBox.button(1).onTrue(new MoveElevatorToPos(elevator,4));
+      m_buttonBox.button(2).onTrue(new MoveElevatorToPos(elevator,3));
+      m_buttonBox.button(3).onTrue(new MoveElevatorToPos(elevator,2));
+      m_buttonBox.button(4).onTrue(new MoveElevatorToPos(elevator,1));
+      m_buttonBox.button(9).onTrue(new MoveElevatorToPos(elevator,0));
 
     }
 

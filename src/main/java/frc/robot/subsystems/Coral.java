@@ -10,7 +10,11 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -25,7 +29,9 @@ public class Coral extends SubsystemBase{
     private static Coral instance = null;
     public Coral(){
         coralMotor = new SparkMax(Constants.Motors.CORAL_MOTOR, MotorType.kBrushless);
-        //set up and configure the motors
+        SparkMaxConfig config = new SparkMaxConfig();
+        config.smartCurrentLimit(50).idleMode(IdleMode.kBrake);
+        coralMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
     public static Coral getInstance(){
         if(instance == null){

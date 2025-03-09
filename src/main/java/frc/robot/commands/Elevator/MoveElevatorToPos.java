@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ser.std.MapProperty;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Elevator;
-public class MoveElevator extends Command{
+public class MoveElevatorToPos extends Command{
     
     //THIS IS SET UP FOR HOLDING A BUTTON :thimbs:
     //untested
@@ -12,7 +12,7 @@ public class MoveElevator extends Command{
     private int m_level;
 
     
-    public MoveElevator(Elevator elevator, int level){
+    public MoveElevatorToPos(Elevator elevator, int level){
         m_ElevatorSubsystem = elevator;
         m_level = level;
 
@@ -35,7 +35,7 @@ public class MoveElevator extends Command{
     }
     @Override
     public boolean isFinished(){
-        return true;
+        return false;
     }
 
 }
