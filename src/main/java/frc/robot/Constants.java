@@ -42,13 +42,14 @@ public final class Constants
     
     public static final int ELEVATOR = 9;
     public static final int CORAL_MOTOR = 10;
-    public static final int ALGAE_LEFT = 11;
-    public static final int ALGAE_RIGHT = 12;
+    public static final int ALGAE_UP = 11;
+    // motor removed
+    // public static final int ALGAE_DOWN = 12;
     public static final int LIFT_MOTOR = 13;
   
   }
   //not real numbers
-    public static final double[] LiftLevelOffsets = {0,1,2,3,4};
+    public static final double[] ElevatorLevelOffsets = {0.71, 1.61, 2.97,5.41 };
 
 
 //  public static final class AutonConstants
@@ -73,5 +74,8 @@ public final class Constants
     public static final double LEFT_Y_DEADBAND = 0.1;
     public static final double RIGHT_X_DEADBAND = 0.1;
     public static final double TURN_CONSTANT    = 6;
+
+    public static final int kDriverControllerPort = 0;
+    public static final int kCopilotControllerPort = 1;
   }
 }

@@ -2,25 +2,25 @@
   "drive": {
     "type": "talonfx",
     "id": 1,
-    "canbus": null
+    "canbus": "Calamari"
   },
   "angle": {
     "type": "talonfx",
     "id": 2,
-    "canbus": null
+    "canbus": "Calamari"
   },
   "encoder": {
     "type": "cancoder",
     "id": 1,
-    "canbus": null
+    "canbus": "Calamari"
   },
   "inverted": {
     "drive": false,
     "angle": false
   },
-  "absoluteEncoderOffset": -31.816,
+  "absoluteEncoderOffset": 287.1,
   "location": {
-    "front": -7,
-    "left": -7
+    "front": -13.5,
+    "left": -11.5
   }
 }
