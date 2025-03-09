@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.Coral.ShootCoral;
 import frc.robot.commands.Elevator.MoveElevator;
 import frc.robot.commands.Elevator.MoveElevatorUP;
 //import frc.robot.commands.MoveLift;
@@ -161,6 +162,8 @@ public class RobotContainer
 
       driverXbox.start().whileTrue(Commands.none());
       driverXbox.back().whileTrue(Commands.none());
+       driverXbox.rightTrigger().whileTrue(new ShootCoral(coral, coralSensor));
+
       // driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
       // driverXbox.rightBumper().onTrue(Commands.none());
 
