@@ -3,10 +3,10 @@ package frc.robot.commands;
 import com.fasterxml.jackson.databind.ser.std.MapProperty;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.Coral;
 import frc.robot.subsystems.Elevator;
 public class MoveElevator extends Command{
     
-    //THIS IS SET UP FOR HOLDING A BUTTON :thimbs:
     //untested
     private final Elevator m_ElevatorSubsystem;
     private int m_level;

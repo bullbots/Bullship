@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.MoveElevator;
+import frc.robot.subsystems.Coral;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
@@ -46,7 +47,8 @@ public class RobotContainer
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem       drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                                 "swerve/hybrid"));
-  public static final Elevator elevator = new Elevator();
+  public static final Elevator elevator = Elevator.getInstance();
+  public static final Coral coral = Coral.getInstance();
 
 
   /**
@@ -164,7 +166,7 @@ public class RobotContainer
       //uncomment this when we are actually ready to try the elevator
 
       // elevator1Button.onTrue(new MoveElevator(elevator, 1));
-      // elevator2Button.onTrue(new MoveElevator(elevator, 2));
+      // elevator2Button.onTrue(new MoveElevator(elevator, 2)); 
       // elevator3Button.onTrue(new MoveElevator(elevator, 3));
       // elevator4Button.onTrue(new MoveElevator(elevator, 4));
 

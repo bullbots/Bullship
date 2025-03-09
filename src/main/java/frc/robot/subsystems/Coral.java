@@ -12,53 +12,53 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-public class Elevator extends SubsystemBase{
+public class Coral extends SubsystemBase{
     //private final TalonFX m_LeftLiftMotor;
     //private final TalonFX m_RightLiftMotor;
     //private final CANBus kCANBus = new CANBus("canivore");
-    private final TalonFX elevatorMotor;
+    private final TalonFX coralMotor;
     
     boolean locked = false;
     int currentLevel = 1;
-    private static Elevator instance = null;
-    public Elevator(){
-        elevatorMotor = new TalonFX(Constants.Motors.ELEVATOR);
+    private static Coral instance = null;
+    public Coral(){
+        coralMotor = new TalonFX(Constants.Motors.ELEVATOR);
+        configCoralMotors();
         //set up and configure the motors
-        configElevatorMotors();
     }
-    public static Elevator getInstance(){
+    public static Coral getInstance(){
         if(instance == null){
-            instance = new Elevator();
+            instance = new Coral();
         }
         return instance;
     }
     //The inversions of the motors are untested and may need to be flipped or both be the same
     //The motion magic settings are just copeid from last year so may need to be adjusted, and should be tested
-    public void configElevatorMotors(){
+    public void configCoralMotors(){
         //TalonFXConfiguration config = new TalonFXConfiguration();
-        var elevatorMotorConfig = new TalonFXConfiguration();
-        // elevatorMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-        elevatorMotor.setSafetyEnabled(true);
+        var coralMotorConfig = new TalonFXConfiguration();
+        // coralMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive
+        coralMotor.setSafetyEnabled(true);
         /* Configure current limits */
-        MotionMagicConfigs mm = elevatorMotorConfig.MotionMagic;
+        MotionMagicConfigs mm = coralMotorConfig.MotionMagic;
         mm.MotionMagicCruiseVelocity = 25; // 5 rotations per second cruise
         mm.MotionMagicAcceleration = 50; // Take approximately 0.5 seconds to reach max vel
         // Take approximately 0.2 seconds to reach max accel
         mm.MotionMagicJerk = 50;
 
-        Slot0Configs slot0 = elevatorMotorConfig.Slot0;
+        Slot0Configs slot0 = coralMotorConfig.Slot0;
         slot0.kP = 60;
         slot0.kI = 0;
         slot0.kD = 0.1;
         slot0.kV = 0.12;
         slot0.kS = 0.25; // Approximately 0.25V to get the mechanism moving
 
-        FeedbackConfigs r_fdb = elevatorMotorConfig.Feedback;
+        FeedbackConfigs r_fdb = coralMotorConfig.Feedback;
         r_fdb.SensorToMechanismRatio = 12.8;
 
         StatusCode status = StatusCode.StatusCodeNotInitialized;
         for (int i = 0; i < 5; ++i) {
-            status = elevatorMotor.getConfigurator().apply(elevatorMotorConfig);
+            status = coralMotor.getConfigurator().apply(coralMotorConfig);
             
             if (status.isOK())
                 break;
@@ -69,37 +69,24 @@ public class Elevator extends SubsystemBase{
     }
 
 
-    public void MoveElevatorUp(){
+    public void MoveCoral(){
         if(locked){
-            System.out.println("elevator locked");
+            System.out.println("coral locked");
             return;
         }
-        elevatorMotor.set(1);
-
+        coralMotor.set(1);
     }
-    public void MoveElevatorDown(){
-        if(locked){
-            System.out.println("elevator locked");
-            return;
-        }
-        elevatorMotor.set(-1);
-
-    }
-    public void StopElevator(){
-        elevatorMotor.set(0);  
+    public void StopCoral(){
+        coralMotor.set(0);
     }
     
-    public void LockElevator(){
+    public void LockCoral(){
         locked = true;
     }
-    public void UnlockElevator(){
+    public void UnlockCoral(){
         locked = false;
     }
-    public void MoveToLevel(int level){
-        //im not sure if this is correct
-        //m_LeftLiftMotor.setPosition(Constants.LiftLevelOffsets[level-1]);
-        elevatorMotor.setPosition(Constants.LiftLevelOffsets[level-1]);
-    }
+
     
 
 
