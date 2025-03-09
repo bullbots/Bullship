@@ -9,6 +9,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -16,12 +17,20 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.Coral.ShootCoral;
+import frc.robot.commands.Coral.IntakeCoral;
+import frc.robot.commands.Elevator.MoveElevatorToPos;
+import frc.robot.commands.Elevator.MoveElevatorUP;
+import frc.robot.subsystems.Coral;
+import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
 import swervelib.SwerveInputStream;
+
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very
@@ -32,11 +41,17 @@ public class RobotContainer
 {
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  final         CommandXboxController driverXbox = new CommandXboxController(0);
+  public final CommandXboxController driverXbox = new CommandXboxController(0);
+  private final CommandJoystick m_buttonBox = new CommandJoystick(OperatorConstants.kCopilotControllerPort);
+
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem       drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
-                                                                                "swerve/neo"));
+                                                                                "swerve/falcon"));
+  public static final Elevator elevator = new Elevator();
 
+  private DigitalInput coralSensor = new DigitalInput(0);
+
+  public static final Coral coral = new Coral();
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
    */
@@ -122,7 +137,8 @@ public class RobotContainer
 
     if (RobotBase.isSimulation())
     {
-      drivebase.setDefaultCommand(driveFieldOrientedDirectAngleKeyboard);
+//      drivebase.setDefaultCommand(driveFieldOrientedDirectAngleKeyboard);
+      drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
     } else
     {
       drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
@@ -159,7 +175,7 @@ public class RobotContainer
     {
       drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command above!
 
-      driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
+      //driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
       driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
       driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
       driverXbox.back().whileTrue(drivebase.centerModulesCommand());
@@ -167,16 +183,30 @@ public class RobotContainer
       driverXbox.rightBumper().onTrue(Commands.none());
     } else
     {
-      driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-      driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
+      driverXbox.a().onTrue((Commands.print("drivebase::zeroGyro").andThen(drivebase::zeroGyro)));
+      //driverXbox.x().onTrue(new MoveElevator(elevator, 0));
+      //driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
       driverXbox.b().whileTrue(
           drivebase.driveToPose(
               new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
                               );
+      // driverXbox.leftBumper().onTrue(new MoveLift(lift, 1));
+      // driverXbox.rightBumper().onTrue(new MoveLift(lift, 2));
+
       driverXbox.start().whileTrue(Commands.none());
       driverXbox.back().whileTrue(Commands.none());
-      driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-      driverXbox.rightBumper().onTrue(Commands.none());
+      driverXbox.rightTrigger().whileTrue(new ShootCoral(coral, coralSensor));
+      driverXbox.rightBumper().whileTrue(new IntakeCoral(coral, coralSensor));
+
+      // driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
+      // driverXbox.rightBumper().onTrue(Commands.none());
+
+      m_buttonBox.button(1).onTrue(new MoveElevatorToPos(elevator,4));
+      m_buttonBox.button(2).onTrue(new MoveElevatorToPos(elevator,3));
+      m_buttonBox.button(3).onTrue(new MoveElevatorToPos(elevator,2));
+      m_buttonBox.button(4).onTrue(new MoveElevatorToPos(elevator,1));
+      m_buttonBox.button(9).onTrue(new MoveElevatorToPos(elevator,0));
+
     }
 
   }
@@ -189,7 +219,7 @@ public class RobotContainer
   public Command getAutonomousCommand()
   {
     // An example command will be run in autonomous
-    return drivebase.getAutonomousCommand("New Auto");
+    return drivebase.getAutonomousCommand("test");
   }
 
   public void setMotorBrake(boolean brake)

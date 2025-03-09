@@ -25,6 +25,33 @@ public final class Constants
   public static final double MAX_SPEED  = Units.feetToMeters(14.5);
   // Maximum speed of the robot in meters per second, used to limit acceleration.
 
+  //IDs
+  public final class Motors{
+
+    public static final int BACK_RIGHT_DRIVE = 1;
+    public static final int BACK_RIGHT_SWERVE = 2;
+    
+    public static final int BACK_LEFT_DRIVE = 3;
+    public static final int BACK_LEFT_SWERVE = 4;
+    
+    public static final int FRONT_RIGHT_DRIVE = 5;
+    public static final int FRONT_RIGHT_SWERVE = 6;
+    
+    public static final int FRONT_LEFT_DRIVE = 7;
+    public static final int FRONT_LEFT_SWERVE = 8;
+    
+    public static final int ELEVATOR = 9;
+    public static final int CORAL_MOTOR = 10;
+    public static final int ALGAE_UP = 11;
+    // motor removed
+    // public static final int ALGAE_DOWN = 12;
+    public static final int LIFT_MOTOR = 13;
+  
+  }
+    //Coral positions
+    public static final double[] ElevatorLevelOffsets = {0, 1.23, 2.01, 3.58,5.83 };
+
+
 //  public static final class AutonConstants
 //  {
 //
@@ -47,5 +74,8 @@ public final class Constants
     public static final double LEFT_Y_DEADBAND = 0.1;
     public static final double RIGHT_X_DEADBAND = 0.1;
     public static final double TURN_CONSTANT    = 6;
+
+    public static final int kDriverControllerPort = 0;
+    public static final int kCopilotControllerPort = 1;
   }
 }
