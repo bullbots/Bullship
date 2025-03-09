@@ -1,7 +1,5 @@
 package frc.robot.commands.Elevator;
 
-import com.fasterxml.jackson.databind.ser.std.MapProperty;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Elevator;
 public class MoveElevatorToPos extends Command{
@@ -21,7 +19,7 @@ public class MoveElevatorToPos extends Command{
 
     @Override
     public void initialize() {
-        m_ElevatorSubsystem.MoveToLevel(m_level);
+        m_ElevatorSubsystem.moveToLevel(m_level);
         System.out.println("MoveElevator.initialize ");
     } 
     @Override
@@ -31,7 +29,7 @@ public class MoveElevatorToPos extends Command{
 
     @Override
     public void end(boolean isFinished){
-        m_ElevatorSubsystem.StopElevator();
+        m_ElevatorSubsystem.stopElevator();
     }
     @Override
     public boolean isFinished(){
