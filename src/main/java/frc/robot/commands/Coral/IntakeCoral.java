@@ -33,7 +33,7 @@ public class IntakeCoral extends Command{
     //if not working switch this to !m_Sensor.get()
     @Override
     public boolean isFinished(){
-        return m_Sensor.get();
+        return !m_Sensor.get();
     }
 
 }

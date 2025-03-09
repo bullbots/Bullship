@@ -8,6 +8,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -18,13 +19,15 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Coral.ShootCoral;
+import frc.robot.commands.Coral.IntakeCoral;
 import frc.robot.commands.Elevator.MoveElevator;
 import frc.robot.commands.Elevator.MoveElevatorUP;
-//import frc.robot.commands.MoveLift;
+import frc.robot.subsystems.Coral;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
 import swervelib.SwerveInputStream;
+
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very
@@ -41,7 +44,9 @@ public class RobotContainer
                                                                                 "swerve/falcon"));
   public static final Elevator elevator = new Elevator();
   private final CommandJoystick m_buttonBox = new CommandJoystick(OperatorConstants.kCopilotControllerPort);
+  private DigitalInput coralSensor = new DigitalInput(0);
 
+  public static final Coral coral = new Coral();
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
    */
@@ -162,7 +167,8 @@ public class RobotContainer
 
       driverXbox.start().whileTrue(Commands.none());
       driverXbox.back().whileTrue(Commands.none());
-       driverXbox.rightTrigger().whileTrue(new ShootCoral(coral, coralSensor));
+      driverXbox.rightTrigger().whileTrue(new ShootCoral(coral, coralSensor));
+      driverXbox.rightBumper().whileTrue(new IntakeCoral(coral, coralSensor));
 
       // driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
       // driverXbox.rightBumper().onTrue(Commands.none());
