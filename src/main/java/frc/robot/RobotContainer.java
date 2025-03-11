@@ -21,9 +21,11 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Coral.ShootCoral;
 import frc.robot.commands.Coral.IntakeCoral;
 import frc.robot.commands.Elevator.MoveElevatorToPos;
-import frc.robot.commands.Elevator.MoveElevatorUP;
+import frc.robot.commands.Elevator.MoveElevatorUp;
+import frc.robot.commands.Lift.MoveLiftDown;
 import frc.robot.subsystems.Coral;
 import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Lift;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
 import swervelib.SwerveInputStream;
@@ -43,6 +45,7 @@ public class RobotContainer
   private final SwerveSubsystem       drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                                 "swerve/falcon"));
   public static final Elevator elevator = new Elevator();
+  public static final Lift lift = new Lift();
   private final CommandJoystick m_buttonBox = new CommandJoystick(OperatorConstants.kCopilotControllerPort);
   private DigitalInput coralSensor = new DigitalInput(0);
 
@@ -165,7 +168,7 @@ public class RobotContainer
       // driverXbox.leftBumper().onTrue(new MoveLift(lift, 1));
       // driverXbox.rightBumper().onTrue(new MoveLift(lift, 2));
 
-      driverXbox.start().whileTrue(Commands.none());
+      driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
       driverXbox.back().whileTrue(Commands.none());
       driverXbox.rightTrigger().whileTrue(new ShootCoral(coral, coralSensor));
       driverXbox.rightBumper().whileTrue(new IntakeCoral(coral, coralSensor));
@@ -178,6 +181,7 @@ public class RobotContainer
       m_buttonBox.button(3).onTrue(new MoveElevatorToPos(elevator,2));
       m_buttonBox.button(4).onTrue(new MoveElevatorToPos(elevator,1));
       m_buttonBox.button(9).onTrue(new MoveElevatorToPos(elevator,0));
+      m_buttonBox.button(7).onTrue(new MoveLiftDown(lift));
 
     }
 
