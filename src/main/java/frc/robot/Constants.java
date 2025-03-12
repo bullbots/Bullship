@@ -49,7 +49,7 @@ public final class Constants
   
   }
     //Coral positions
-    public static final double[] ElevatorLevelOffsets = {0, 1.23, 2.01, 3.58,5.83 };
+    public static final double[] ElevatorLevelOffsets = {0, 1.23, 2.01, 3.58, 5.83, 3, 5 };
 
 
 //  public static final class AutonConstants

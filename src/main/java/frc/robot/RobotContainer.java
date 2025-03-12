@@ -24,8 +24,10 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Coral.ShootCoral;
 import frc.robot.commands.Coral.IntakeCoral;
 import frc.robot.commands.Elevator.MoveElevatorToPos;
+import frc.robot.commands.Lift.MoveLiftDown;
 import frc.robot.subsystems.Coral;
 import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Lift;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
 import swervelib.SwerveInputStream;
@@ -51,6 +53,8 @@ public class RobotContainer
   private static final DigitalInput coralSensor = new DigitalInput(0);
 
   public static final Coral coral = new Coral();
+
+  public static final Lift lift = new Lift();
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
    */
@@ -188,10 +192,13 @@ public class RobotContainer
       // driverXbox.leftBumper().onTrue(new MoveLift(lift, 1));
       // driverXbox.rightBumper().onTrue(new MoveLift(lift, 2));
 
-      driverXbox.start().whileTrue(Commands.none());
+      driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
       driverXbox.back().whileTrue(Commands.none());
       driverXbox.rightTrigger().whileTrue(new ShootCoral(coral, coralSensor));
       driverXbox.rightBumper().whileTrue(new IntakeCoral(coral, coralSensor));
+      //Idea for algea yeeting
+      //driverXbox.leftTrigger().whileTrue(new YeetPos(algea));
+      //driverXbox.leftTrigger().onFalse(new Yeet(algea))
 
       // driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
       // driverXbox.rightBumper().onTrue(Commands.none());
@@ -201,6 +208,12 @@ public class RobotContainer
       buttonBox.button(3).onTrue(new MoveElevatorToPos(elevator,2));
       buttonBox.button(4).onTrue(new MoveElevatorToPos(elevator,1));
       buttonBox.button(9).onTrue(new MoveElevatorToPos(elevator,0));
+      //buttonBox.button(6).onTrue(new MoveLiftUp(lift));
+      buttonBox.button(7).onTrue(new MoveLiftDown(lift));
+      //Algea arm positions that we guessed
+      buttonBox.button(5).onTrue(new MoveElevatorToPos(elevator,5 ));
+      buttonBox.button(11).onTrue(new MoveElevatorToPos(elevator, 6));
+
 
     }
 
