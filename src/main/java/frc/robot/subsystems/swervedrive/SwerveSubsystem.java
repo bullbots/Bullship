@@ -509,6 +509,13 @@ public class SwerveSubsystem extends SubsystemBase
     swerveDrive.drive(velocity);
   }
 
+  public Command drive(Supplier<ChassisSpeeds> velocity)
+  {
+    return run(() -> {
+      swerveDrive.drive(velocity.get());
+    });
+  }
+
 
   /**
    * Get the swerve drive kinematics object.

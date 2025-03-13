@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Coral.ShootCoral;
+import frc.robot.commands.StrafeAndMoveForward;
 import frc.robot.commands.Coral.IntakeCoral;
 import frc.robot.commands.Elevator.MoveElevatorToPos;
 import frc.robot.commands.Lift.MoveLiftDown;
@@ -78,6 +79,22 @@ public class RobotContainer
    */
   SwerveInputStream driveRobotOriented = driveAngularVelocity.copy().robotRelative(true)
                                                              .allianceRelativeControl(false);
+
+
+  SwerveInputStream driveStrafeRight = SwerveInputStream.of(drivebase.getSwerveDrive(),
+                                                             () -> 0.15,
+                                                             () -> -0.5)
+                                                         .withControllerRotationAxis(() -> 0)
+                                                         .allianceRelativeControl(false)
+                                                         .robotRelative(true);
+
+  SwerveInputStream driveStrafeLeft = SwerveInputStream.of(drivebase.getSwerveDrive(),
+                                                         () -> 0.15,
+                                                         () -> 0.5)
+                                                     .withControllerRotationAxis(() -> 0)
+                                                     .allianceRelativeControl(false)
+                                                     .robotRelative(true);
+
 
 //  SwerveInputStream driveAngularVelocityKeyboard = SwerveInputStream.of(drivebase.getSwerveDrive(),
 //                                                                        () -> -driverXbox.getLeftY(),
@@ -195,9 +212,9 @@ public class RobotContainer
       driverXbox.back().whileTrue(Commands.none());
       driverXbox.rightTrigger().whileTrue(new ShootCoral(coral, coralSensor));
       driverXbox.rightBumper().whileTrue(new IntakeCoral(coral, coralSensor));
-      //Idea for algea yeeting
-      //driverXbox.leftTrigger().whileTrue(new YeetPos(algea));
-      //driverXbox.leftTrigger().onFalse(new Yeet(algea))
+
+      driverXbox.povRight().whileTrue(new StrafeAndMoveForward(drivebase, driveStrafeRight));
+      driverXbox.povLeft().whileTrue(new StrafeAndMoveForward(drivebase, driveStrafeLeft));
 
       // driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
       // driverXbox.rightBumper().onTrue(Commands.none());
