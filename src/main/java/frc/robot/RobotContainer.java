@@ -182,7 +182,6 @@ public class RobotContainer
       driverXbox.rightBumper().onTrue(Commands.none());
     } else
     {
-      driverXbox.a().onTrue((Commands.print("drivebase::zeroGyro").andThen(drivebase::zeroGyro)));
       //driverXbox.x().onTrue(new MoveElevator(elevator, 0));
       //driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
       driverXbox.b().whileTrue(
@@ -192,7 +191,7 @@ public class RobotContainer
       // driverXbox.leftBumper().onTrue(new MoveLift(lift, 1));
       // driverXbox.rightBumper().onTrue(new MoveLift(lift, 2));
 
-      driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
+      driverXbox.start().onTrue((Commands.print("drivebase::zeroGyro").andThen(drivebase::zeroGyro)));
       driverXbox.back().whileTrue(Commands.none());
       driverXbox.rightTrigger().whileTrue(new ShootCoral(coral, coralSensor));
       driverXbox.rightBumper().whileTrue(new IntakeCoral(coral, coralSensor));
