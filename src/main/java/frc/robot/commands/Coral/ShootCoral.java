@@ -1,7 +1,5 @@
 package frc.robot.commands.Coral;
 
-import com.fasterxml.jackson.databind.ser.std.MapProperty;
-
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Coral;
@@ -17,7 +15,7 @@ public class ShootCoral extends Command{
 
     @Override
     public void initialize() {
-        m_Coral.MoveCoral();
+        m_Coral.moveCoral();
     } 
     @Override
     public void execute(){
@@ -26,7 +24,7 @@ public class ShootCoral extends Command{
 
     @Override
     public void end(boolean isFinished){
-        m_Coral.StopCoral();
+        m_Coral.stopCoral();
     }
     //if not working switch this to !m_Sensor.get()
     @Override
