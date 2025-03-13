@@ -80,20 +80,20 @@ public class RobotContainer
   SwerveInputStream driveRobotOriented = driveAngularVelocity.copy().robotRelative(true)
                                                              .allianceRelativeControl(false);
 
-
+//using opposite value until we understand
   SwerveInputStream driveStrafeRight = SwerveInputStream.of(drivebase.getSwerveDrive(),
-                                                             () -> 0.15,
-                                                             () -> -0.5)
+                                                             () -> -0.05,
+                                                             () -> 0.25)
                                                          .withControllerRotationAxis(() -> 0)
-                                                         .allianceRelativeControl(false)
-                                                         .robotRelative(true);
+                                                         .allianceRelativeControl(false);
+                                                         //.robotRelative(true);
 
   SwerveInputStream driveStrafeLeft = SwerveInputStream.of(drivebase.getSwerveDrive(),
-                                                         () -> 0.15,
-                                                         () -> 0.5)
+                                                         () -> -0.05,
+                                                         () -> -0.25)
                                                      .withControllerRotationAxis(() -> 0)
-                                                     .allianceRelativeControl(false)
-                                                     .robotRelative(true);
+                                                     .allianceRelativeControl(false);
+                                                    // .robotRelative(true);
 
 
 //  SwerveInputStream driveAngularVelocityKeyboard = SwerveInputStream.of(drivebase.getSwerveDrive(),

@@ -16,6 +16,21 @@
           "double[]##v_/SmartDashboard/swerve/desiredStates": {
             "open": true
           },
+          "modules": {
+            "backleft": {
+              "open": true
+            },
+            "backright": {
+              "open": true
+            },
+            "frontleft": {
+              "open": true
+            },
+            "frontright": {
+              "open": true
+            },
+            "open": true
+          },
           "open": true
         }
       }
@@ -28,6 +43,7 @@
       "/SmartDashboard/IMU": "Alerts",
       "/SmartDashboard/JSON": "Alerts",
       "/SmartDashboard/Motors": "Alerts",
+      "/SmartDashboard/PathPlanner": "Alerts",
       "/SmartDashboard/Swerve Drive": "Alerts"
     },
     "windows": {
@@ -43,6 +59,9 @@
         }
       }
     }
+  },
+  "NetworkTables Info": {
+    "visible": true
   },
   "NetworkTables Settings": {
     "mode": "Client (NT4)",

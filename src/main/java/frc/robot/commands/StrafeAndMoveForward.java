@@ -18,9 +18,14 @@ public class StrafeAndMoveForward extends Command {
     }
 
     @Override
+    public void initialize() {
+        System.out.println("StrafeAndMoveForward.initialize()");
+    }
+
+    @Override
     public void execute() {
 
-        swerveSubsystem.drive(inputStream);
+        swerveSubsystem.drive(inputStream.get());
     }
 
     @Override
