@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Coral.ShootCoral;
+import frc.robot.commands.Autos.Autos;
 import frc.robot.commands.StrafeAndMoveForward;
 import frc.robot.commands.Coral.IntakeCoral;
 import frc.robot.commands.Elevator.MoveElevatorToPos;
@@ -44,14 +45,14 @@ public class RobotContainer
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   public static final CommandXboxController driverXbox = new CommandXboxController(0);
-  private static final CommandJoystick buttonBox = new CommandJoystick(OperatorConstants.kCopilotControllerPort);
+  public static final CommandJoystick buttonBox = new CommandJoystick(OperatorConstants.kCopilotControllerPort);
 
   // The robot's subsystems and commands are defined here...
-  private static final SwerveSubsystem drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
+  public static final SwerveSubsystem drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
           "swerve/falcon"));
   public static final Elevator elevator = new Elevator();
 
-  private static final DigitalInput coralSensor = new DigitalInput(0);
+  public static final DigitalInput coralSensor = new DigitalInput(0);
 
   public static final Coral coral = new Coral();
 
@@ -134,6 +135,8 @@ public class RobotContainer
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
     NamedCommands.registerCommand("test", Commands.print("I EXIST"));
+
+    Autos.load();
   }
 
   /**
@@ -243,7 +246,8 @@ public class RobotContainer
   public Command getAutonomousCommand()
   {
     // An example command will be run in autonomous
-    return drivebase.getAutonomousCommand("test");
+    return Autos.getSelected();
+    // return drivebase.getAutonomousCommand("test");
   }
 
   public void setMotorBrake(boolean brake)
