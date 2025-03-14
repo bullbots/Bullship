@@ -176,7 +176,7 @@ public class RobotContainer {
       driverXbox.povLeft().whileTrue(new StrafeAndMoveForward(drivebase, driveStrafeLeft));
       driverXbox.a().whileTrue(new AlgaeArmsBarf(algaeExtractor));
 
-      driverXbox.x().onTrue(new DeferredCommand(new SwervePathToAprilTagSupplier(), Set.of(drivebase)));
+      //driverXbox.x().onTrue(new DeferredCommand(new SwervePathToAprilTagSupplier(), Set.of(drivebase)));
       // driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
       // driverXbox.rightBumper().onTrue(Commands.none());
 
