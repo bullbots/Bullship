@@ -10,6 +10,7 @@ import frc.robot.subsystems.AlgaeExtractor;
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class AlgaeArmsBarf extends Command {
   private AlgaeExtractor algeaExtractor;
+
   /** Creates a new AlgeaArmsMoveDown. */
   public AlgaeArmsBarf(AlgaeExtractor algeaExtractor) {
     this.algeaExtractor = algeaExtractor;
@@ -19,17 +20,18 @@ public class AlgaeArmsBarf extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-algeaExtractor.barf();
+    algeaExtractor.barf();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+  }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    if (interrupted){
+    if (interrupted) {
       algeaExtractor.moveArmsHold();
     }
   }

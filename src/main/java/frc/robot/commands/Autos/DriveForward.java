@@ -7,7 +7,6 @@ package frc.robot.commands.Autos;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
-import swervelib.SwerveInputStream;
 
 public class DriveForward extends WaitCommand {
   int wait;
@@ -32,14 +31,13 @@ public class DriveForward extends WaitCommand {
   @Override
   public void execute() {
     var direction = 1.0;
-    if(swerveSubsystem.isRedAlliance()){
+    if (swerveSubsystem.isRedAlliance()) {
 
-    direction = -1.0;
+      direction = -1.0;
     }
 
-
-    swerveSubsystem.driveFieldOriented(new ChassisSpeeds(-0.5*direction,0,0));
-    wait += 1; 
+    swerveSubsystem.driveFieldOriented(new ChassisSpeeds(-0.5 * direction, 0, 0));
+    wait += 1;
   }
 
   // Called once the command ends or is interrupted.

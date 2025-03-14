@@ -24,18 +24,15 @@ public class AlgaeExtractor extends SubsystemBase {
   private final SparkMax algeaMotor;
   private final RelativeEncoder encoder;
   private SparkClosedLoopController closedLoopController;
-  
-  public boolean armsOut = false;
 
+  public boolean armsOut = false;
 
   /** Creates a new AlgeaExtractor. */
   public AlgaeExtractor() {
     algeaMotor = new SparkMax(Constants.Motors.ALGAE_MOTOR, MotorType.kBrushless);
-        SparkMaxConfig config = new SparkMaxConfig();
-        config.smartCurrentLimit(50).idleMode(IdleMode.kBrake);
-        algeaMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
-
+    SparkMaxConfig config = new SparkMaxConfig();
+    config.smartCurrentLimit(50).idleMode(IdleMode.kBrake);
+    algeaMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     closedLoopController = algeaMotor.getClosedLoopController();
     encoder = algeaMotor.getEncoder();
@@ -44,7 +41,6 @@ public class AlgaeExtractor extends SubsystemBase {
      * Create a new SPARK MAX configuration object. This will store the
      * configuration parameters for the SPARK MAX that we will set below.
      */
-
 
     /*
      * Configure the encoder. For this specific example, we are using the
@@ -98,15 +94,12 @@ public class AlgaeExtractor extends SubsystemBase {
      */
     algeaMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
 
-    
-
-
   }
 
   public void moveArmDown() {
-      closedLoopController.setReference(Constants.AlgeaSetPosition, ControlType.kMAXMotionPositionControl,
-          ClosedLoopSlot.kSlot0);
-      armsOut = true;
+    closedLoopController.setReference(Constants.AlgeaSetPosition, ControlType.kMAXMotionPositionControl,
+        ClosedLoopSlot.kSlot0);
+    armsOut = true;
 
   }
 
@@ -114,29 +107,29 @@ public class AlgaeExtractor extends SubsystemBase {
     closedLoopController.setReference(0, ControlType.kMAXMotionPositionControl,
         ClosedLoopSlot.kSlot0);
 
-        armsOut = false;
+    armsOut = false;
 
-}
-public void barf() {
-  closedLoopController.setReference(Constants.AlgeaBarfPosition, ControlType.kMAXMotionPositionControl,
-      ClosedLoopSlot.kSlot0);
+  }
 
-      armsOut = true;
+  public void barf() {
+    closedLoopController.setReference(Constants.AlgeaBarfPosition, ControlType.kMAXMotionPositionControl,
+        ClosedLoopSlot.kSlot0);
 
+    armsOut = true;
 
-}
-public void moveArmsHold() {
-  closedLoopController.setReference(0, ControlType.kMAXMotionPositionControl,
-      ClosedLoopSlot.kSlot0);
+  }
 
+  public void moveArmsHold() {
+    closedLoopController.setReference(0, ControlType.kMAXMotionPositionControl,
+        ClosedLoopSlot.kSlot0);
 
-       armsOut = true;
-}
+    armsOut = true;
+  }
 
   @Override
   public void periodic() {
     var pos = encoder.getPosition();
-    
+
     SmartDashboard.putNumber("AlgeaMotorPos", pos);
     // This method will be called once per scheduler run
   }
