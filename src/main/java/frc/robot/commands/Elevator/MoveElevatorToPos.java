@@ -1,6 +1,7 @@
 package frc.robot.commands.Elevator;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.Elevator;
 import swervelib.SwerveInputStream;
 public class MoveElevatorToPos extends Command{
@@ -24,8 +25,16 @@ public class MoveElevatorToPos extends Command{
 
     @Override
     public void initialize() {
-        m_ElevatorSubsystem.moveToLevel(m_level);
+
         System.out.println("MoveElevator.initialize ");
+
+        if (RobotContainer.coralSensor.get() && !RobotContainer.algaeExtractor.armsOut)
+        {
+            System.out.println("no coral detected!!!!!!!!!!!!!!!!!!!!!!!!!");
+            return;
+        }
+        m_ElevatorSubsystem.moveToLevel(m_level);
+       
 
     
     var scalefactor = 0.8;

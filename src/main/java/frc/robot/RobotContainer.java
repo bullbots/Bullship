@@ -4,14 +4,14 @@
 
 package frc.robot;
 
+import java.io.File;
+
 import com.pathplanner.lib.auto.NamedCommands;
-import edu.wpi.first.math.controller.ProfiledPIDController;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -21,22 +21,19 @@ import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.Coral.ShootCoral;
-import frc.robot.commands.Autos.Autos;
-import frc.robot.commands.StrafeAndMoveForward;
 import frc.robot.commands.Algae.AlgaeArmsBarf;
 import frc.robot.commands.Algae.AlgaeArmsMoveDown;
 import frc.robot.commands.Algae.AlgaeArmsMoveUp;
+import frc.robot.commands.Autos.Autos;
 import frc.robot.commands.Coral.IntakeCoral;
-import frc.robot.commands.Elevator.AlgaeSetPosition;
+import frc.robot.commands.Coral.ShootCoral;
 import frc.robot.commands.Elevator.MoveElevatorToPos;
-import frc.robot.commands.Lift.MoveLiftDown;
+import frc.robot.commands.StrafeAndMoveForward;
 import frc.robot.subsystems.AlgaeExtractor;
 import frc.robot.subsystems.Coral;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Lift;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
-import java.io.File;
 import swervelib.SwerveInputStream;
 
 
@@ -234,13 +231,13 @@ public class RobotContainer
 
       buttonBox.button(2).onTrue(new MoveElevatorToPos(elevator,2,driveAngularVelocity));
       buttonBox.button(3).onTrue(new MoveElevatorToPos(elevator,1,driveAngularVelocity));
-      buttonBox.button(4).onTrue(new MoveElevatorToPos(elevator,0,driveAngularVelocity));
+      buttonBox.button(4).onTrue(new MoveElevatorToPos(elevator,0,driveAngularVelocity)); 
       //buttonBox.button(9).onTrue(new MoveElevatorToPos(elevator,5));
       //buttonBox.button(6).onTrue(new MoveLiftUp(lift));
       //buttonBox.button(7).onTrue(new MoveLiftDown(lift));
       //Algea arm positions that we guessed
-      buttonBox.button(5).onTrue(new AlgaeSetPosition(4, elevator, algaeExtractor));
-      buttonBox.button(11).onTrue(new AlgaeSetPosition(5,elevator, algaeExtractor));
+      buttonBox.button(5).onTrue(new MoveElevatorToPos(elevator,4,driveAngularVelocity)); 
+      buttonBox.button(11).onTrue(new MoveElevatorToPos(elevator,5,driveAngularVelocity)); 
 
 
     }
