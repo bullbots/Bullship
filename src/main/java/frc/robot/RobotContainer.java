@@ -5,6 +5,7 @@
 package frc.robot;
 
 import java.io.File;
+import java.util.Set;
 
 import com.pathplanner.lib.auto.NamedCommands;
 
@@ -17,6 +18,7 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -29,6 +31,7 @@ import frc.robot.commands.Coral.IntakeCoral;
 import frc.robot.commands.Coral.ShootCoral;
 import frc.robot.commands.Elevator.MoveElevatorToPos;
 import frc.robot.commands.StrafeAndMoveForward;
+import frc.robot.commands.swervedrive.SwervePathToAprilTagSupplier;
 import frc.robot.subsystems.AlgaeExtractor;
 import frc.robot.subsystems.Coral;
 import frc.robot.subsystems.Elevator;
@@ -224,6 +227,8 @@ public class RobotContainer
       driverXbox.povRight().whileTrue(new StrafeAndMoveForward(drivebase, driveStrafeRight));
       driverXbox.povLeft().whileTrue(new StrafeAndMoveForward(drivebase, driveStrafeLeft));
       driverXbox.a().whileTrue(new AlgaeArmsBarf(algaeExtractor));
+
+      driverXbox.x().onTrue(new DeferredCommand(new SwervePathToAprilTagSupplier(),Set.of(drivebase)));
       // driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
       // driverXbox.rightBumper().onTrue(Commands.none());
 
