@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+import frc.robot.commands.Elevator.AlgaeSetPosition;
 import swervelib.math.Matter;
 
 /**
@@ -42,14 +43,18 @@ public final class Constants
     
     public static final int ELEVATOR = 9;
     public static final int CORAL_MOTOR = 10;
-    public static final int ALGAE_UP = 11;
+    public static final int ALGAE_MOTOR = 12;
     // motor removed
     // public static final int ALGAE_DOWN = 12;
     public static final int LIFT_MOTOR = 13;
   
   }
-    //Coral positions
-    public static final double[] ElevatorLevelOffsets = {0, 1.23, 2.01, 3.58, 5.83, 3, 5 };
+    //Coral positions and Algea positions
+    //0 bottom, 2.01 second/trough, 0.98 is algea l1, 2.44 is algea l2
+    public static final double[] ElevatorLevelOffsets = {0, 2.01, 3.58, 5.83, 0.98, 2.44 };
+    public static final double AlgeaSetPosition = -9.73;
+    public static final double AlgeaBarfPosition = -14.59;
+    public static final double AlgeaHoldPosition = -8./75;
 
 
 //  public static final class AutonConstants

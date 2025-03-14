@@ -21,6 +21,7 @@ public class IntakeCoral extends Command{
     @Override
     public void initialize() {
         coral.moveCoral();
+        System.out.println("IntakeCoral.initialize");
     }
 
     @Override
@@ -32,6 +33,7 @@ public class IntakeCoral extends Command{
     public void end(boolean isFinished){
         coral.stopCoral();
         controllerVibrate.schedule();
+        System.out.println("IntakeCoral.end()");
     }
 
     @Override

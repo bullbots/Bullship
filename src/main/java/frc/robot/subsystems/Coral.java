@@ -16,18 +16,11 @@ public class Coral extends SubsystemBase{
     
     boolean locked = false;
     int currentLevel = 1;
-    private static Coral instance = null;
     public Coral(){
         coralMotor = new SparkMax(Constants.Motors.CORAL_MOTOR, MotorType.kBrushless);
         SparkMaxConfig config = new SparkMaxConfig();
         config.smartCurrentLimit(50).idleMode(IdleMode.kBrake);
         coralMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    }
-    public static Coral getInstance(){
-        if(instance == null){
-            instance = new Coral();
-        }
-        return instance;
     }
     //The inversions of the motors are untested and may need to be flipped or both be the same
     //The motion magic settings are just copeid from last year so may need to be adjusted, and should be tested

@@ -31,8 +31,15 @@ public class DriveForward extends WaitCommand {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    swerveSubsystem.driveFieldOriented(SwerveInputStream.of(swerveSubsystem.getSwerveDrive(), () -> 0, () -> 1));
-    wait += 1;
+    var direction = 1.0;
+    if(swerveSubsystem.isRedAlliance()){
+
+    direction = -1.0;
+    }
+
+
+    swerveSubsystem.driveFieldOriented(new ChassisSpeeds(-0.5*direction,0,0));
+    wait += 1; 
   }
 
   // Called once the command ends or is interrupted.

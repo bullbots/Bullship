@@ -26,7 +26,7 @@ public final class Autos {
             new DoNothing("Doing Nothing"));
 
         commandChooser.addOption("Drive Forward",
-            new DriveForward(1.5, RobotContainer.drivebase));
+            new DriveForward(3, RobotContainer.drivebase));
 
         SmartDashboard.putData("Command Selected", commandChooser);
     }

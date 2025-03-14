@@ -9,6 +9,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 public class Elevator extends SubsystemBase{
@@ -100,8 +101,8 @@ public class Elevator extends SubsystemBase{
     @Override
     public void periodic() {
         // Remove debug print/SmartDashboard statements in main.
-//        var elevatorEncoder = m_elevatorMotor.getPosition().getValueAsDouble();
-//        SmartDashboard.putNumber("Elevator Encoder", elevatorEncoder);
-//        SmartDashboard.putNumber("Elevator Currant", m_elevatorMotor.getSupplyCurrent().getValueAsDouble());
+       var elevatorEncoder = elevatorMotor.getPosition().getValueAsDouble();
+       SmartDashboard.putNumber("Elevator Encoder", elevatorEncoder);
+       //SmartDashboard.putNumber("Elevator Currant", m_elevatorMotor.getSupplyCurrent().getValueAsDouble());
     }
 }
