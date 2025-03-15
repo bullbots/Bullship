@@ -19,6 +19,10 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -170,25 +174,79 @@ public class RobotContainer {
       driverXbox.back().whileTrue(Commands.none());
       driverXbox.rightTrigger().whileTrue(new ShootCoral(coral, coralSensor));
       driverXbox.rightBumper().whileTrue(new IntakeCoral(coral, coralSensor));
-      driverXbox.leftTrigger().onTrue(new AlgaeArmsMoveDown(algaeExtractor));
-      driverXbox.leftBumper().whileTrue(new AlgaeArmsMoveUp(algaeExtractor));
+      driverXbox.leftTrigger().whileTrue(new AlgaeArmsMoveDown(algaeExtractor));
+      driverXbox.leftBumper().onTrue(new AlgaeArmsMoveUp(algaeExtractor));
       driverXbox.povRight().whileTrue(new StrafeAndMoveForward(drivebase, driveStrafeRight));
       driverXbox.povLeft().whileTrue(new StrafeAndMoveForward(drivebase, driveStrafeLeft));
       driverXbox.a().whileTrue(new AlgaeArmsBarf(algaeExtractor));
+      driverXbox.y().onTrue(Commands.run(()->{elevator.childSafetyEnabled = false;}));
 
       //driverXbox.x().onTrue(new DeferredCommand(new SwervePathToAprilTagSupplier(), Set.of(drivebase)));
       // driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
       // driverXbox.rightBumper().onTrue(Commands.none());
 
-      buttonBox.button(1).onTrue(new MoveElevatorToPos(elevator, 3, driveAngularVelocity));
+      var command1 = new MoveElevatorToPos(elevator, 3, driveAngularVelocity);
 
-      buttonBox.button(2).onTrue(new MoveElevatorToPos(elevator, 2, driveAngularVelocity));
-      buttonBox.button(3).onTrue(new MoveElevatorToPos(elevator, 1, driveAngularVelocity));
-      buttonBox.button(4).onTrue(new MoveElevatorToPos(elevator, 0, driveAngularVelocity));
+      // var command2 = new SequentialCommandGroup(new RunCommand(() -> {
+      //   if (command1.isScheduled()) {
+      //     command1.end(true);
+      //   }
+      // }),
+      //   command1
+      // );
+      
+      buttonBox.button(1).onTrue(command1);
+      var command3 = new MoveElevatorToPos(elevator, 2, driveAngularVelocity);
+      // var command4 = new SequentialCommandGroup(new RunCommand(() -> {
+      //   if (command3.isScheduled()) {
+      //     command3.end(true);
+      //   }
+      // }),
+      //   command3
+      // );
 
-      // Algae arm positions that we guessed
-      buttonBox.button(5).onTrue(new MoveElevatorToPos(elevator, 4, driveAngularVelocity));
-      buttonBox.button(11).onTrue(new MoveElevatorToPos(elevator, 5, driveAngularVelocity));
+      buttonBox.button(2).onTrue(command3);
+
+      var command5 = new MoveElevatorToPos(elevator, 1, driveAngularVelocity);
+      // var command6 = new SequentialCommandGroup(new RunCommand(() -> {
+      //   if (command5.isScheduled()) {
+      //     command5.end(true);
+      //   }
+      // }),
+      //   command5
+      // );
+
+      buttonBox.button(3).onTrue(command5);
+      var command7 = new MoveElevatorToPos(elevator, 0, driveAngularVelocity);
+      // var command8 = new SequentialCommandGroup(new RunCommand(() -> {
+      //   if (command7.isScheduled()) {
+      //     command7.end(true);
+      //   }
+      // }),
+      //   command7
+      // );
+
+      buttonBox.button(4).onTrue(command7);
+      var command9 = new MoveElevatorToPos(elevator, 4, driveAngularVelocity);
+      // var command10 = new SequentialCommandGroup(new RunCommand(() -> {
+      //   if (command9.isScheduled()) {
+      //     command9.end(true);
+      //   }
+      // }),
+      //   command9
+      // );
+
+      buttonBox.button(5).onTrue(command9);
+
+      var command11 = new MoveElevatorToPos(elevator, 5, driveAngularVelocity);
+      // var command12 = new SequentialCommandGroup(new RunCommand(() -> {
+      //   if (command11.isScheduled()) {
+      //     command11.end(true);
+      //   }
+      // }),
+      //   command11
+      // );
+      buttonBox.button(11).onTrue(command11);
     }
   }
 

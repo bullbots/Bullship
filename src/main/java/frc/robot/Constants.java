@@ -57,7 +57,7 @@ public final class Constants {
   public static final double[] ElevatorLevelOffsets = { 0, 2.01, 3.58, 5.83, 0.98, 2.44 };
   public static final double AlgeaSetPosition = -9.73;
   public static final double AlgeaBarfPosition = -14.59;
-  public static final double AlgeaHoldPosition = -8. / 75;
+  public static final double AlgeaHoldPosition = -6.0;
 
   public static final class DrivebaseConstants {
 

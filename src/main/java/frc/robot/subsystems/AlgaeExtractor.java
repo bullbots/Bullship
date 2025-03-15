@@ -96,14 +96,14 @@ public class AlgaeExtractor extends SubsystemBase {
 
   }
 
-  public void moveArmDown() {
+  public void moveArmsDown() {
     closedLoopController.setReference(Constants.AlgeaSetPosition, ControlType.kMAXMotionPositionControl,
         ClosedLoopSlot.kSlot0);
     armsOut = true;
 
   }
 
-  public void moveArmUp() {
+  public void moveArmsUp() {
     closedLoopController.setReference(0, ControlType.kMAXMotionPositionControl,
         ClosedLoopSlot.kSlot0);
 
@@ -120,7 +120,7 @@ public class AlgaeExtractor extends SubsystemBase {
   }
 
   public void moveArmsHold() {
-    closedLoopController.setReference(0, ControlType.kMAXMotionPositionControl,
+    closedLoopController.setReference(Constants.AlgeaHoldPosition, ControlType.kMAXMotionPositionControl,
         ClosedLoopSlot.kSlot0);
 
     armsOut = true;
