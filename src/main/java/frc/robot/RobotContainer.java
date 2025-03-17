@@ -66,7 +66,7 @@ public class RobotContainer {
 
   public static final Coral coral = new Coral();
 
-  public static final Lift lift = new Lift();
+  // public static final Lift lift = new Lift();
 
   public static final AlgaeExtractor algaeExtractor = new AlgaeExtractor();
   /**
@@ -182,7 +182,7 @@ public class RobotContainer {
       driverXbox.y().onTrue(Commands.run(()->{elevator.childSafetyEnabled = false;}));
 
       //driverXbox.x().onTrue(new DeferredCommand(new SwervePathToAprilTagSupplier(), Set.of(drivebase)));
-      // driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
+      driverXbox.b().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
       // driverXbox.rightBumper().onTrue(Commands.none());
 
       var command1 = new MoveElevatorToPos(elevator, 3, driveAngularVelocity);
