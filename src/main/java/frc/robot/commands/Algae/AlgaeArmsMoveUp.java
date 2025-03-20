@@ -20,7 +20,7 @@ public class AlgaeArmsMoveUp extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    algeaExtractor.moveArmUp();
+    algeaExtractor.moveArmsUp();
   }
 
   // Called every time the scheduler runs while the command is scheduled.

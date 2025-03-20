@@ -27,10 +27,12 @@ public class MoveElevatorToPos extends Command {
 
         System.out.println("MoveElevator.initialize ");
 
-        if (RobotContainer.coralSensor.get() && !RobotContainer.algaeExtractor.armsOut) {
-            System.out.println("no coral detected!!!!!!!!!!!!!!!!!!!!!!!!!");
-            return;
-        }
+        // // if (RobotContainer.coralSensor.get() && !RobotContainer.algaeExtractor.armsOut) {
+        // if (m_ElevatorSubsystem.childSafetyEnabled && RobotContainer.coralSensor.get()) {
+        //     System.out.println("no coral detected!!!!!!!!!!!!!!!!!!!!!!!!!");
+            
+        //     return;
+        // }
         m_ElevatorSubsystem.moveToLevel(m_level);
 
         var scalefactor = 0.8;
@@ -39,7 +41,7 @@ public class MoveElevatorToPos extends Command {
             scalefactor = 0.3;
 
         }
-        driveAngularVelocity.scaleTranslation(scalefactor);
+        // driveAngularVelocity.scaleTranslation(scalefactor);
     }
 
     @Override

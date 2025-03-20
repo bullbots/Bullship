@@ -32,7 +32,7 @@ public class AlgaeArmsBarf extends Command {
   @Override
   public void end(boolean interrupted) {
     if (interrupted) {
-      algeaExtractor.moveArmsHold();
+      algeaExtractor.moveArmsUp();
     }
   }
 
