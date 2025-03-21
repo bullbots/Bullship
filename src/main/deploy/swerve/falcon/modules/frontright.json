@@ -15,7 +15,7 @@
     "canbus": "Calamari"
   },
   "inverted": {
-    "drive": true,
+    "drive": false,
     "angle": false
   },
   "absoluteEncoderOffset": 334.6,
