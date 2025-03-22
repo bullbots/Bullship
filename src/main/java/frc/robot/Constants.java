@@ -45,7 +45,7 @@ public final class Constants {
 
     public static final int ELEVATOR = 9;
     public static final int CORAL_MOTOR = 10;
-    public static final int ALGAE_MOTOR = 12;
+    public static final int ALGAE_MOTOR = 11;
     // motor removed
     // public static final int ALGAE_DOWN = 12;
     public static final int LIFT_MOTOR = 13;
@@ -55,9 +55,9 @@ public final class Constants {
   // Coral positions and Algea positions
   // 0 bottom, 2.01 second/trough, 0.98 is algae L1, 2.44 is algae L2
   public static final double[] ElevatorLevelOffsets = { 0, 2.01, 3.58, 5.95, 0.98, 2.44 };
-  public static final double AlgeaSetPosition = -9.73;
-  public static final double AlgeaBarfPosition = -14.59;
-  public static final double AlgeaHoldPosition = -6.0;
+  public static final double AlgeaSetPosition = 8;
+  public static final double AlgeaBarfPosition = 14.8;
+  public static final double AlgeaHoldPosition = 6;
 
   public static final class DrivebaseConstants {
 

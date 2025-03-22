@@ -31,7 +31,7 @@ public class AlgaeExtractor extends SubsystemBase {
   public AlgaeExtractor() {
     algeaMotor = new SparkMax(Constants.Motors.ALGAE_MOTOR, MotorType.kBrushless);
     SparkMaxConfig config = new SparkMaxConfig();
-    config.smartCurrentLimit(50).idleMode(IdleMode.kBrake);
+    config.smartCurrentLimit(20).idleMode(IdleMode.kBrake);
     algeaMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     closedLoopController = algeaMotor.getClosedLoopController();
@@ -63,24 +63,24 @@ public class AlgaeExtractor extends SubsystemBase {
         .p(0.4)
         .i(0)
         .d(0)
-        .outputRange(-1, 1)
-        // Set PID values for velocity control in slot 1
-        .p(0.0001, ClosedLoopSlot.kSlot1)
-        .i(0, ClosedLoopSlot.kSlot1)
-        .d(0, ClosedLoopSlot.kSlot1)
-        .velocityFF(1.0 / 5767, ClosedLoopSlot.kSlot1)
-        .outputRange(-1, 1, ClosedLoopSlot.kSlot1);
+        .outputRange(-1, 1);
+        // // Set PID values for velocity control in slot 1
+        // .p(0.0001, ClosedLoopSlot.kSlot1)
+        // .i(0, ClosedLoopSlot.kSlot1)
+        // .d(0, ClosedLoopSlot.kSlot1)
+        // .velocityFF(1.0 / 5767, ClosedLoopSlot.kSlot1)
+        // .outputRange(-1, 1, ClosedLoopSlot.kSlot1);
 
     config.closedLoop.maxMotion
         // Set MAXMotion parameters for position control. We don't need to pass
         // a closed loop slot, as it will default to slot 0.
         .maxVelocity(1000)
         .maxAcceleration(1000)
-        .allowedClosedLoopError(1)
-        // Set MAXMotion parameters for velocity control in slot 1
-        .maxAcceleration(500, ClosedLoopSlot.kSlot1)
-        .maxVelocity(6000, ClosedLoopSlot.kSlot1)
-        .allowedClosedLoopError(1, ClosedLoopSlot.kSlot1);
+        .allowedClosedLoopError(0.01);
+        // // Set MAXMotion parameters for velocity control in slot 1
+        // .maxAcceleration(500, ClosedLoopSlot.kSlot1)
+        // .maxVelocity(6000, ClosedLoopSlot.kSlot1)
+        // .allowedClosedLoopError(1, ClosedLoopSlot.kSlot1);
 
     /*
      * Apply the configuration to the SPARK MAX.
@@ -129,8 +129,9 @@ public class AlgaeExtractor extends SubsystemBase {
   @Override
   public void periodic() {
     var pos = encoder.getPosition();
+    SmartDashboard.putNumber("AlgaeMotorPos", pos);
 
-    SmartDashboard.putNumber("AlgeaMotorPos", pos);
-    // This method will be called once per scheduler run
+    var current = algeaMotor.getOutputCurrent();
+    SmartDashboard.putNumber("AlgaeCurrent", current);
   }
 }
