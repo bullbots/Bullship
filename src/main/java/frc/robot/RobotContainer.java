@@ -34,6 +34,8 @@ import frc.robot.commands.Autos.Autos;
 import frc.robot.commands.Coral.IntakeCoral;
 import frc.robot.commands.Coral.ShootCoral;
 import frc.robot.commands.Elevator.MoveElevatorToPos;
+import frc.robot.commands.Lift.MoveLiftDown;
+import frc.robot.commands.Lift.MoveLiftUp;
 import frc.robot.commands.StrafeAndMoveForward;
 import frc.robot.commands.swervedrive.SwervePathToAprilTagSupplier;
 import frc.robot.subsystems.AlgaeExtractor;
@@ -66,7 +68,7 @@ public class RobotContainer {
 
   public static final Coral coral = new Coral();
 
-  // public static final Lift lift = new Lift();
+  public static final Lift lift = new Lift();
 
   public static final AlgaeExtractor algaeExtractor = new AlgaeExtractor();
   /**
@@ -170,18 +172,23 @@ public class RobotContainer {
           drivebase.driveToPose(
               new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0))));
 
-      driverXbox.start().onTrue((Commands.print("drivebase::zeroGyro").andThen(drivebase::zeroGyro)));
+      driverXbox.start().onTrue((Commands.print("drivebase::zeroGyro").andThen(drivebase::zeroGyroWithAlliance)));
       driverXbox.back().whileTrue(Commands.none());
       driverXbox.rightTrigger().whileTrue(new ShootCoral(coral, coralSensor));
       driverXbox.rightBumper().whileTrue(new IntakeCoral(coral, coralSensor));
       driverXbox.leftTrigger().whileTrue(new AlgaeArmsMoveDown(algaeExtractor));
       driverXbox.leftBumper().onTrue(new AlgaeArmsMoveUp(algaeExtractor));
-      driverXbox.povRight().whileTrue(new StrafeAndMoveForward(drivebase, driveStrafeRight));
-      driverXbox.povLeft().whileTrue(new StrafeAndMoveForward(drivebase, driveStrafeLeft));
+      //driverXbox.povRight().whileTrue(new StrafeAndMoveForward(drivebase, driveStrafeRight));
+     // driverXbox.povLeft().whileTrue(new StrafeAndMoveForward(drivebase, driveStrafeLeft));
       driverXbox.a().whileTrue(new AlgaeArmsBarf(algaeExtractor));
       driverXbox.y().onTrue(Commands.run(()->{elevator.childSafetyEnabled = false;}));
 
-      //driverXbox.x().onTrue(new DeferredCommand(new SwervePathToAprilTagSupplier(), Set.of(drivebase)));
+      driverXbox.povUp().whileTrue(new MoveLiftUp(lift));
+      driverXbox.povDown().whileTrue(new MoveLiftDown(lift));
+      
+
+      driverXbox.povRight().whileTrue(new DeferredCommand(new SwervePathToAprilTagSupplier(), Set.of(drivebase)));
+      
       driverXbox.b().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
       // driverXbox.rightBumper().onTrue(Commands.none());
 
@@ -258,7 +265,8 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
     // return Autos.getSelected();
-    return drivebase.getAutonomousCommand("straight_auto");
+    // return drivebase.getAutonomousCommand("straight_auto");
+    return new DeferredCommand(new SwervePathToAprilTagSupplier(), Set.of(drivebase));
   }
 
   public void setMotorBrake(boolean brake) {

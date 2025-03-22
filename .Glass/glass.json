@@ -9,10 +9,16 @@
         },
         "open": true,
         "swerve": {
+          "advantagescope": {
+            "open": true
+          },
           "double[]##v_/SmartDashboard/swerve/desiredChassisSpeeds": {
             "open": true
           },
           "double[]##v_/SmartDashboard/swerve/desiredStates": {
+            "open": true
+          },
+          "imu": {
             "open": true
           },
           "modules": {
@@ -31,6 +37,12 @@
             "open": true
           }
         }
+      },
+      "limelight-aprilta": {
+        "double[]##v_/limelight-aprilta/botpose_wpiblue": {
+          "open": true
+        },
+        "open": true
       }
     },
     "types": {
@@ -68,15 +80,34 @@
     "Plot <0>": {
       "plots": [
         {
+          "axis": [
+            {
+              "autoFit": true
+            }
+          ],
           "backgroundColor": [
             0.0,
             0.0,
             0.0,
             0.8500000238418579
           ],
-          "height": 338
+          "height": 338,
+          "series": [
+            {
+              "color": [
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/AlgaeCurrent"
+            }
+          ]
         }
-      ]
+      ],
+      "window": {
+        "visible": false
+      }
     }
   }
 }

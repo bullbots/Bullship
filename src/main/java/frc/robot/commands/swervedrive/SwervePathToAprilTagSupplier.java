@@ -31,7 +31,7 @@ public class SwervePathToAprilTagSupplier implements Supplier<Command>{
             var poseEstimate = drivebase.getBlueBotPoseEstimate();
             // drivebase.resetOdometry(poseEstimate);
             // cur_pose = drivebase.getPose();
-            System.out.printf("poseEstimate: %s%n", poseEstimate);
+            // System.out.printf("poseEstimate: %s%n", poseEstimate);
           
             PathConstraints constraints;
             constraints = new PathConstraints(
@@ -42,7 +42,7 @@ public class SwervePathToAprilTagSupplier implements Supplier<Command>{
             // var results = LimelightHelpers.getLatestResults("limelight");
             // var fiducials = results.targets_Classifier;
           
-            var id = LimelightHelpers.getFiducialID("limelight");
+            var id = LimelightHelpers.getFiducialID("limelight-aprilta");
           
             var aprilTagPose = drivebase.getAprilTagPose((int) id);
           
@@ -50,21 +50,21 @@ public class SwervePathToAprilTagSupplier implements Supplier<Command>{
             
             Pose2d convertedTag2d = aprilTag2d.rotateAround(aprilTag2d.getTranslation(), aprilTag2d.getRotation());
           
-            Pose2d convertedTag2d2 = convertedTag2d.transformBy(new Transform2d(0.356, 0, new Rotation2d(0)));
+            Pose2d convertedTag2d2 = convertedTag2d.transformBy(new Transform2d(0.356, 0.165, new Rotation2d(0)));
           
-            Pose2d finalPose = convertedTag2d2.rotateAround(aprilTag2d.getTranslation(), aprilTag2d.getRotation().times(-1));
+            Pose2d convertedTagPose = convertedTag2d2.rotateAround(aprilTag2d.getTranslation(), aprilTag2d.getRotation().times(-1));
           
           
             // Rotation2d aprilTagRotation = aprilTagPose.get().getRotation().toRotation2d();
             // var aprilTagVector = aprilTagPose.
           
-            Pose2d pose = new Pose2d(finalPose.getX(), finalPose.getY(), finalPose.getRotation().rotateBy(Rotation2d.fromDegrees(180)));
+            Pose2d finalPose = new Pose2d(convertedTagPose.getX(), convertedTagPose.getY(), convertedTagPose.getRotation().rotateBy(Rotation2d.fromDegrees(180)));
           
             // var pose2d = fiducials[0].getTargetPose_RobotSpace2D();
             // var poseRot = pose2d.rotateBy(poseEstimate.getRotation().times(-1));
             // System.out.printf("target x: %f target z: %f%n", pose2d.getX(), pose2d.getY());  
             // Pose2d pose = poseEstimate.plus(new Transform2d(poseRot.getX(), poseRot.getY(), Rotation2d.fromDegrees(60)));
-            return AutoBuilder.pathfindToPose(pose, constraints);
+            return AutoBuilder.pathfindToPose(finalPose, constraints);
           
     
         }

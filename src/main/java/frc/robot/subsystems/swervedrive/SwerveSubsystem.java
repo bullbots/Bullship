@@ -29,6 +29,7 @@ import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -40,6 +41,7 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import static edu.wpi.first.units.Units.Meter;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -68,7 +70,8 @@ public class SwerveSubsystem extends SubsystemBase {
   /**
    * AprilTag field layout.
    */
-  private final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
+  private final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout
+      .loadField(AprilTagFields.k2025ReefscapeAndyMark);
   /**
    * Enable vision odometry updates while driving.
    */
@@ -77,6 +80,8 @@ public class SwerveSubsystem extends SubsystemBase {
    * PhotonVision class to keep an accurate odometry.
    */
   private Vision vision;
+
+  private boolean isYawSet = false;
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -150,11 +155,59 @@ public class SwerveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+      if(!isYawSet){
+
+        LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-aprilta");
+        if (mt1.tagCount >= 2) {
+
+          // swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
+          // swerveDrive.swerveDrivePoseEstimator.addVisionMeasurement(
+          //     mt1.pose,
+          //     mt1.timestampSeconds);
+          resetOdometry(mt1.pose);
+        }
+
+        isYawSet = true;
+        return;
+      }
+
+    // if (!seesAprilTag()) {
+    //   // System.out.println("I don't see any AprilTags");
+    //   return;
+    // }
+
     // When vision is enabled we must manually update odometry in SwerveDrive
     if (visionDriveTest) {
       swerveDrive.updateOdometry();
       vision.updatePoseEstimation(swerveDrive);
     }
+
+    // LimelightHelpers.SetRobotOrientation("limelight-aprilta",
+    //     swerveDrive.swerveDrivePoseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
+    // LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-aprilta");
+
+    // if (mt2.tagCount == 0) {
+    //   return;
+    // } 
+
+    // if (RobotState.isEnabled()) {
+    //   var poseEstimate = getBlueBotPoseEstimate();
+    //   var distance = poseEstimate.getTranslation().getDistance(mt2.pose.getTranslation());
+      
+    //   if (Math.abs(distance) <= 0.5) {
+    //     swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
+    //     swerveDrive.swerveDrivePoseEstimator.addVisionMeasurement(
+    //         mt2.pose,
+    //         mt2.timestampSeconds);
+    //   }
+
+    // } else {
+    //   swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
+    //   swerveDrive.swerveDrivePoseEstimator.addVisionMeasurement(
+    //       mt2.pose,
+    //       mt2.timestampSeconds);
+        
+    // }
   }
 
   @Override
@@ -597,9 +650,10 @@ public class SwerveSubsystem extends SubsystemBase {
     if (isRedAlliance()) {
       zeroGyro();
       // Set the pose 180 degrees
-      resetOdometry(new Pose2d(getPose().getTranslation(), Rotation2d.fromDegrees(180)));
+      //resetOdometry(new Pose2d(getPose().getTranslation(), Rotation2d.fromDegrees(180)));
     } else {
       zeroGyro();
+      resetOdometry(new Pose2d(getPose().getTranslation(), Rotation2d.fromDegrees(180)));
     }
   }
 
@@ -732,15 +786,18 @@ public class SwerveSubsystem extends SubsystemBase {
   public SwerveDrive getSwerveDrive() {
     return swerveDrive;
   }
-  public Pose2d getBlueBotPoseEstimate(){
-    //replace void with correct var
+
+  public Pose2d getBlueBotPoseEstimate() {
+    // replace void with correct var
     return swerveDrive.swerveDrivePoseEstimator.getEstimatedPosition();
   }
-  public boolean seesAprilTag(){
-    LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
-    return mt2.tagCount !=0;
+
+  public boolean seesAprilTag() {
+    LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-aprilta");
+    return mt2.tagCount != 0;
   }
+
   public Optional<Pose3d> getAprilTagPose(int ID) {
-      return aprilTagFieldLayout.getTagPose(ID);
+    return aprilTagFieldLayout.getTagPose(ID);
   }
 }
