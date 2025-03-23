@@ -19,6 +19,7 @@ public class Elevator extends SubsystemBase {
     private final TalonFX elevatorMotor;
     private final MotionMagicVoltage mmReq = new MotionMagicVoltage(0);
     public boolean childSafetyEnabled = false;
+    private static final double TOLERANCE = 0.1;
 
     boolean locked = false;
     int currentLevel = 1;
@@ -102,6 +103,12 @@ public class Elevator extends SubsystemBase {
         System.out.println("Elevator.MoveToLevel()");
         currentLevel = level;
         elevatorMotor.setControl(mmReq.withPosition(Constants.ElevatorLevelOffsets[level]).withSlot(0));
+    }
+
+    public boolean isAtPosition(int level) {
+        double elevatorPosition = Constants.ElevatorLevelOffsets[level];
+        return ((elevatorPosition - TOLERANCE) <= elevatorMotor.getPosition().getValueAsDouble()) &&
+           (elevatorMotor.getPosition().getValueAsDouble() <= (elevatorPosition + TOLERANCE));
     }
 
     @Override

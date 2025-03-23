@@ -9,9 +9,6 @@
         },
         "open": true,
         "swerve": {
-          "advantagescope": {
-            "open": true
-          },
           "double[]##v_/SmartDashboard/swerve/desiredChassisSpeeds": {
             "open": true
           },
@@ -33,9 +30,9 @@
             },
             "frontright": {
               "open": true
-            },
-            "open": true
-          }
+            }
+          },
+          "open": true
         }
       },
       "limelight-aprilta": {
@@ -58,6 +55,11 @@
       "/SmartDashboard/Swerve Drive": "Alerts"
     },
     "windows": {
+      "/SmartDashboard/Command Selected": {
+        "window": {
+          "visible": true
+        }
+      },
       "/SmartDashboard/Field": {
         "bottom": 1638,
         "builtin": "2025 Reefscape",

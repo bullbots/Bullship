@@ -81,7 +81,9 @@ public class SwerveSubsystem extends SubsystemBase {
    */
   private Vision vision;
 
-  private boolean isYawSet = false;
+  private boolean isInitialPoseSet = false;
+
+  private int limeLightRunner = 0;
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -155,59 +157,58 @@ public class SwerveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-      if(!isYawSet){
 
-        LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-aprilta");
-        if (mt1.tagCount >= 2) {
+    if (!isInitialPoseSet) {
 
-          // swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
-          // swerveDrive.swerveDrivePoseEstimator.addVisionMeasurement(
-          //     mt1.pose,
-          //     mt1.timestampSeconds);
-          resetOdometry(mt1.pose);
-        }
-
-        isYawSet = true;
+      LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-aprilta");
+      if (mt1 == null) {
         return;
       }
 
-    // if (!seesAprilTag()) {
-    //   // System.out.println("I don't see any AprilTags");
-    //   return;
+      if (mt1.tagCount >= 2) {
+        var estimatedPose = mt1.pose;
+        resetOdometry(estimatedPose);
+        isInitialPoseSet = true;
+      }
+
+    } else {
+
+    // // When vision is enabled we must manually update odometry in SwerveDrive
+    // if (visionDriveTest) {
+    //   swerveDrive.updateOdometry();
+    //   vision.updatePoseEstimation(swerveDrive);
+
     // }
 
-    // When vision is enabled we must manually update odometry in SwerveDrive
-    if (visionDriveTest) {
-      swerveDrive.updateOdometry();
-      vision.updatePoseEstimation(swerveDrive);
+    limeLightRunner++;
+    if (limeLightRunner < 10) {
+      return;
+    }
+    limeLightRunner = 0;
+
+    LimelightHelpers.SetRobotOrientation("limelight-aprilta",
+        swerveDrive.swerveDrivePoseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
+    LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-aprilta");
+
+    if (mt2 == null) {
+      return;
     }
 
-    // LimelightHelpers.SetRobotOrientation("limelight-aprilta",
-    //     swerveDrive.swerveDrivePoseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
-    // LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-aprilta");
-
-    // if (mt2.tagCount == 0) {
-    //   return;
-    // } 
+    if (mt2.tagCount == 0) {
+      return;
+    } 
 
     // if (RobotState.isEnabled()) {
-    //   var poseEstimate = getBlueBotPoseEstimate();
-    //   var distance = poseEstimate.getTranslation().getDistance(mt2.pose.getTranslation());
+      var poseEstimate = getBlueBotPoseEstimate();
+      var distance = poseEstimate.getTranslation().getDistance(mt2.pose.getTranslation());
       
-    //   if (Math.abs(distance) <= 0.5) {
-    //     swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
-    //     swerveDrive.swerveDrivePoseEstimator.addVisionMeasurement(
-    //         mt2.pose,
-    //         mt2.timestampSeconds);
-    //   }
-
-    // } else {
-    //   swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
-    //   swerveDrive.swerveDrivePoseEstimator.addVisionMeasurement(
-    //       mt2.pose,
-    //       mt2.timestampSeconds);
-        
-    // }
+      if (Math.abs(distance) <= 0.5) {
+        swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
+        swerveDrive.swerveDrivePoseEstimator.addVisionMeasurement(
+            mt2.pose,
+            mt2.timestampSeconds);
+      }
+    }
   }
 
   @Override
@@ -791,10 +792,12 @@ public class SwerveSubsystem extends SubsystemBase {
     // replace void with correct var
     return swerveDrive.swerveDrivePoseEstimator.getEstimatedPosition();
   }
-
-  public boolean seesAprilTag() {
+  public boolean seesAprilTag(){
     LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-aprilta");
-    return mt2.tagCount != 0;
+    if (mt2 == null) {
+      return false;
+    }
+    return mt2.tagCount !=0;
   }
 
   public Optional<Pose3d> getAprilTagPose(int ID) {

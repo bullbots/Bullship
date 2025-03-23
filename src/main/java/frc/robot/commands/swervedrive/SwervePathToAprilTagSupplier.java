@@ -4,6 +4,7 @@
 
 package frc.robot.commands.swervedrive;
 
+import java.lang.reflect.Constructor;
 import java.util.function.Supplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -20,9 +21,16 @@ import frc.robot.RobotContainer;
 
 /** Add your docs here. */
 public class SwervePathToAprilTagSupplier implements Supplier<Command>{
+    
+    private double direction;
+    public SwervePathToAprilTagSupplier(double direction){
+        this.direction = direction;
 
+    } 
     @Override
     public Command get() {
+        System.out.printf("SwervePathToAprilTagSupplier.get() %f%n", direction);
+
         var drivebase = RobotContainer.drivebase;
         if(drivebase.seesAprilTag()){
           
@@ -50,10 +58,9 @@ public class SwervePathToAprilTagSupplier implements Supplier<Command>{
             
             Pose2d convertedTag2d = aprilTag2d.rotateAround(aprilTag2d.getTranslation(), aprilTag2d.getRotation());
           
-            Pose2d convertedTag2d2 = convertedTag2d.transformBy(new Transform2d(0.356, 0.165, new Rotation2d(0)));
+            Pose2d convertedTag2d2 = convertedTag2d.transformBy(new Transform2d(0.406, direction*0.167, new Rotation2d(0)));
           
             Pose2d convertedTagPose = convertedTag2d2.rotateAround(aprilTag2d.getTranslation(), aprilTag2d.getRotation().times(-1));
-          
           
             // Rotation2d aprilTagRotation = aprilTagPose.get().getRotation().toRotation2d();
             // var aprilTagVector = aprilTagPose.

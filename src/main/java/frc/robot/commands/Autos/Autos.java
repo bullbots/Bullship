@@ -8,6 +8,8 @@ package frc.robot.commands.Autos;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.RobotContainer;
 
 public final class Autos {
@@ -26,6 +28,10 @@ public final class Autos {
 
         commandChooser.addOption("Drive Forward",
                 new DriveForward(3, RobotContainer.drivebase));
+
+                
+        commandChooser.addOption("test auto",
+                RobotContainer.drivebase.getAutonomousCommand("test_auto"));
 
         SmartDashboard.putData("Command Selected", commandChooser);
     }
