@@ -37,6 +37,7 @@ import frc.robot.commands.Coral.IntakeCoral;
 import frc.robot.commands.Coral.ShootCoral;
 import frc.robot.commands.Coral.ShootCoralWait;
 import frc.robot.commands.Elevator.MoveElevatorToPos;
+import frc.robot.commands.Elevator.MoveElevatorToPosWithFinish;
 import frc.robot.commands.StrafeAndMoveForward;
 import frc.robot.commands.swervedrive.SwervePathToAprilTagSupplier;
 import frc.robot.subsystems.AlgaeExtractor;
@@ -121,10 +122,13 @@ public class RobotContainer {
     // Configure the trigger bindings
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
-    NamedCommands.registerCommand("test", Commands.print("I EXIST"));
+    //NamedCommands.registerCommand("test", Commands.print("I EXIST"));
     NamedCommands.registerCommand("FirstReefRight", new DeferredCommand(new SwervePathToAprilTagSupplier(1.0), Set.of(drivebase)));
-    NamedCommands.registerCommand("GoToFourthLevel", new MoveElevatorToPos(elevator, 3, driveAngularVelocity));
-    
+    NamedCommands.registerCommand("GoToFourthLevel", new MoveElevatorToPosWithFinish(elevator, 3, driveAngularVelocity));
+    NamedCommands.registerCommand("ShootCoral", new ShootCoralWait(1.5, coral, coralSensor));
+    NamedCommands.registerCommand("GoToBottomLevel", new MoveElevatorToPosWithFinish(elevator, 0, driveAngularVelocity));
+    NamedCommands.registerCommand("RunIntake", new IntakeCoral(coral, coralSensor));
+    NamedCommands.registerCommand("FirstReefLeft", new DeferredCommand(new SwervePathToAprilTagSupplier(-1.0), Set.of(drivebase)));
     Autos.load();
   }
 
