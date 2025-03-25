@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 4.943450342465753,
-        "y": 5.294670376712329
+        "x": 5.426644736842105,
+        "y": 5.641447368421052
       },
       "prevControl": {
-        "x": 5.616365270986473,
-        "y": 6.1874002722979435
+        "x": 6.0995596653628255,
+        "y": 6.534177264006667
       },
       "nextControl": null,
       "isLocked": false,
@@ -31,7 +31,14 @@
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "GoToFourthLevel",
+      "waypointRelativePos": 1.0,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 4.42,
     "maxAcceleration": 4.42,
