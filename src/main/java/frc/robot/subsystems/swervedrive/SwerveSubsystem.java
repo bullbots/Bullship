@@ -202,7 +202,7 @@ public class SwerveSubsystem extends SubsystemBase {
       var poseEstimate = getBlueBotPoseEstimate();
       var distance = poseEstimate.getTranslation().getDistance(mt2.pose.getTranslation());
       
-      if (Math.abs(distance) <= 0.5) {
+      if (Math.abs(distance) <= 1.0) {
         swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
         swerveDrive.swerveDrivePoseEstimator.addVisionMeasurement(
             mt2.pose,
