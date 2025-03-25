@@ -29,6 +29,8 @@ import frc.robot.commands.Coral.IntakeCoral;
 import frc.robot.commands.Coral.ShootCoral;
 import frc.robot.commands.Coral.ShootCoralWait;
 import frc.robot.commands.Elevator.MoveElevatorToPos;
+import frc.robot.commands.Lift.MoveLiftDown;
+import frc.robot.commands.Lift.MoveLiftUp;
 import frc.robot.commands.StrafeAndMoveForward;
 import frc.robot.commands.swervedrive.SwervePathToAprilTagSupplier;
 import frc.robot.subsystems.AlgaeExtractor;
@@ -176,6 +178,9 @@ public class RobotContainer {
       driverXbox.leftBumper().onTrue(new AlgaeArmsMoveUp(algaeExtractor));
       driverXbox.a().whileTrue(new AlgaeArmsBarf(algaeExtractor));
       driverXbox.y().onTrue(Commands.run(()->{elevator.childSafetyEnabled = false;}));
+
+      driverXbox.povUp().whileTrue(new MoveLiftUp(lift));
+      driverXbox.povDown().whileTrue(new MoveLiftDown(lift));
 
       driverXbox.povRight().whileTrue(
               new ConditionalCommand(

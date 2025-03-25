@@ -101,6 +101,6 @@ public class Lift extends SubsystemBase {
         // Remove debug print/SmartDashboard statements in main.
         var liftEncoder = m_liftMotor.getPosition().getValueAsDouble();
         SmartDashboard.putNumber("Lift Encoder", liftEncoder);
-        SmartDashboard.putNumber("Lift Currant", m_liftMotor.getSupplyCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("Lift Current", m_liftMotor.getSupplyCurrent().getValueAsDouble());
     }
 }
