@@ -16,15 +16,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.DeferredCommand;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -102,15 +94,15 @@ public class RobotContainer {
 
   // using opposite value until we understand
   SwerveInputStream driveStrafeRight = SwerveInputStream.of(drivebase.getSwerveDrive(),
-      () -> -0.05,
-      () -> 0.25)
+      () -> 0.03,
+      () -> -0.20)
       .withControllerRotationAxis(() -> 0)
       .allianceRelativeControl(false);
   // .robotRelative(true);
 
   SwerveInputStream driveStrafeLeft = SwerveInputStream.of(drivebase.getSwerveDrive(),
-      () -> -0.05,
-      () -> -0.25)
+      () -> 0.03,
+      () -> 0.20)
       .withControllerRotationAxis(() -> 0)
       .allianceRelativeControl(false);
   // .robotRelative(true);
@@ -175,9 +167,9 @@ public class RobotContainer {
     } else {
       // driverXbox.x().onTrue(new MoveElevator(elevator, 0));
       // driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
-      driverXbox.b().whileTrue(
-          drivebase.driveToPose(
-              new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0))));
+      // driverXbox.b().whileTrue(
+      //     drivebase.driveToPose(
+      //         new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0))));
 
       driverXbox.start().onTrue((Commands.print("drivebase::zeroGyro").andThen(drivebase::zeroGyroWithAlliance)));
       driverXbox.back().whileTrue(Commands.none());
@@ -185,79 +177,46 @@ public class RobotContainer {
       driverXbox.rightBumper().whileTrue(new IntakeCoral(coral, coralSensor));
       driverXbox.leftTrigger().whileTrue(new AlgaeArmsMoveDown(algaeExtractor));
       driverXbox.leftBumper().onTrue(new AlgaeArmsMoveUp(algaeExtractor));
-      //driverXbox.povRight().whileTrue(new StrafeAndMoveForward(drivebase, driveStrafeRight));
-      driverXbox.povLeft().whileTrue(new StrafeAndMoveForward(drivebase, driveStrafeLeft));
       driverXbox.a().whileTrue(new AlgaeArmsBarf(algaeExtractor));
       driverXbox.y().onTrue(Commands.run(()->{elevator.childSafetyEnabled = false;}));
 
-      driverXbox.povRight().whileTrue(new DeferredCommand(new SwervePathToAprilTagSupplier(1.0), Set.of(drivebase)));
-      driverXbox.povLeft().whileTrue(new DeferredCommand(new SwervePathToAprilTagSupplier(-1.0), Set.of(drivebase)));
+      driverXbox.povRight().whileTrue(
+              new ConditionalCommand(
+                      new DeferredCommand(new SwervePathToAprilTagSupplier(1.0), Set.of(drivebase)),
+                      new StrafeAndMoveForward(drivebase, driveStrafeRight),
+                      drivebase::seesAprilTag
+              )
+      );
+
+      driverXbox.povLeft().whileTrue(
+              new ConditionalCommand(
+                      new DeferredCommand(new SwervePathToAprilTagSupplier(-1.0), Set.of(drivebase)),
+                      new StrafeAndMoveForward(drivebase, driveStrafeLeft),
+                      drivebase::seesAprilTag
+              )
+      );
+
       driverXbox.b().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-      // driverXbox.rightBumper().onTrue(Commands.none());
 
-      var command1 = new MoveElevatorToPos(elevator, 3, driveAngularVelocity);
-
-      // var command2 = new SequentialCommandGroup(new RunCommand(() -> {
-      //   if (command1.isScheduled()) {
-      //     command1.end(true);
-      //   }
-      // }),
-      //   command1
-      // );
-      
-      buttonBox.button(1).onTrue(command1);
-      var command3 = new MoveElevatorToPos(elevator, 2, driveAngularVelocity);
-      // var command4 = new SequentialCommandGroup(new RunCommand(() -> {
-      //   if (command3.isScheduled()) {
-      //     command3.end(true);
-      //   }
-      // }),
-      //   command3
-      // );
-
-      buttonBox.button(2).onTrue(command3);
-
-      var command5 = new MoveElevatorToPos(elevator, 1, driveAngularVelocity);
-      // var command6 = new SequentialCommandGroup(new RunCommand(() -> {
-      //   if (command5.isScheduled()) {
-      //     command5.end(true);
-      //   }
-      // }),
-      //   command5
-      // );
-
-      buttonBox.button(3).onTrue(command5);
-      var command7 = new MoveElevatorToPos(elevator, 0, driveAngularVelocity);
-      // var command8 = new SequentialCommandGroup(new RunCommand(() -> {
-      //   if (command7.isScheduled()) {
-      //     command7.end(true);
-      //   }
-      // }),
-      //   command7
-      // );
-
-      buttonBox.button(4).onTrue(command7);
-      var command9 = new MoveElevatorToPos(elevator, 4, driveAngularVelocity);
-      // var command10 = new SequentialCommandGroup(new RunCommand(() -> {
-      //   if (command9.isScheduled()) {
-      //     command9.end(true);
-      //   }
-      // }),
-      //   command9
-      // );
-
-      buttonBox.button(5).onTrue(command9);
-
-      var command11 = new MoveElevatorToPos(elevator, 5, driveAngularVelocity);
-      // var command12 = new SequentialCommandGroup(new RunCommand(() -> {
-      //   if (command11.isScheduled()) {
-      //     command11.end(true);
-      //   }
-      // }),
-      //   command11
-      // );
-      buttonBox.button(11).onTrue(command11);
+      // Coral levels
+      setResetCommandLevelButton(0, 4);
+      setResetCommandLevelButton(1, 3);
+      setResetCommandLevelButton(2, 2);
+      setResetCommandLevelButton(3, 1);
+      // Algae levels
+      setResetCommandLevelButton(4, 5);
+      setResetCommandLevelButton(5, 11);
     }
+  }
+
+  private void setResetCommandLevelButton(int level, int buttonNum) {
+    var command = new MoveElevatorToPos(elevator, level, driveAngularVelocity);
+    buttonBox.button(buttonNum).onTrue(new InstantCommand(() -> {
+      if(command.isScheduled()) {
+        command.cancel();
+      }
+      command.schedule();
+    }));
   }
 
   /**
