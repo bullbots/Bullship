@@ -43,7 +43,7 @@ public class SwervePathToAprilTagSupplier implements Supplier<Command>{
           
             PathConstraints constraints;
             constraints = new PathConstraints(
-                    drivebase.getSwerveDrive().getMaximumChassisVelocity()*.25, 4.0,
+                    drivebase.getSwerveDrive().getMaximumChassisVelocity()*.50, 4.0,
                     drivebase.getSwerveDrive().getMaximumChassisAngularVelocity(), Units.degreesToRadians(720));
             
             // var targetPose = LimelightHelpers.getTargetPose_RobotSpace("limelight");
