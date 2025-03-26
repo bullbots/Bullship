@@ -6,13 +6,21 @@
     "GLOBAL": {
       "font": "Proggy Dotted",
       "fps": "120",
-      "height": "1009",
+      "height": "699",
       "maximized": "1",
       "style": "0",
       "userScale": "2",
-      "width": "1920",
+      "width": "1366",
       "xpos": "0",
       "ypos": "23"
+    }
+  },
+  "Table": {
+    "0xE56EC1C2,4": {
+      "Column 0  Weight": "1.0000",
+      "Column 1  Weight": "1.0000",
+      "Column 2  Weight": "1.0000",
+      "Column 3  Weight": "1.0000"
     }
   },
   "Window": {
@@ -21,19 +29,24 @@
       "Pos": "355,10",
       "Size": "169,167"
     },
+    "###/SmartDashboard/Command Selected": {
+      "Collapsed": "0",
+      "Pos": "596,58",
+      "Size": "271,54"
+    },
     "###/SmartDashboard/Field": {
       "Collapsed": "0",
-      "Pos": "793,60",
-      "Size": "1114,639"
+      "Pos": "279,93",
+      "Size": "1114,619"
     },
     "###FMS": {
       "Collapsed": "0",
-      "Pos": "31,589",
-      "Size": "283,140"
+      "Pos": "168,406",
+      "Size": "175,184"
     },
     "###Joysticks": {
       "Collapsed": "0",
-      "Pos": "578,787",
+      "Pos": "578,680",
       "Size": "796,73"
     },
     "###Keyboard 0 Settings": {
@@ -47,7 +60,7 @@
       "Size": "750,236"
     },
     "###NetworkTables Info": {
-      "Collapsed": "1",
+      "Collapsed": "0",
       "Pos": "235,276",
       "Size": "750,145"
     },
@@ -63,7 +76,7 @@
     },
     "###System Joysticks": {
       "Collapsed": "0",
-      "Pos": "27,776",
+      "Pos": "54,603",
       "Size": "192,218"
     },
     "###Timing": {

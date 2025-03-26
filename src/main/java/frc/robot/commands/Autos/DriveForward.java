@@ -5,7 +5,9 @@
 package frc.robot.commands.Autos;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 
 public class DriveForward extends WaitCommand {
@@ -24,6 +26,7 @@ public class DriveForward extends WaitCommand {
   public void initialize() {
     super.initialize();
     wait = 0;
+    swerveSubsystem.zeroGyroWithAlliance();
     System.out.println("DriveForward initialize");
   }
 
@@ -31,6 +34,7 @@ public class DriveForward extends WaitCommand {
   @Override
   public void execute() {
     var direction = 1.0;
+
     if (swerveSubsystem.isRedAlliance()) {
 
       direction = -1.0;

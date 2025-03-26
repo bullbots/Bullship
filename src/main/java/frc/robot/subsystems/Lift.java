@@ -81,7 +81,7 @@ public class Lift extends SubsystemBase {
             System.out.println("lift locked");
             return;
         }
-        m_liftMotor.set(0.2);
+        m_liftMotor.set(0.5);
     }
 
     public void stopLift() {
