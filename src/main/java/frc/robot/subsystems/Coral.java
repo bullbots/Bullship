@@ -38,6 +38,14 @@ public class Coral extends SubsystemBase {
         coralMotor.set(1);
     }
 
+    public void suckCoral() {
+        if (locked) {
+            System.out.println("coral locked");
+            return;
+        }
+        coralMotor.set(-1);
+    }
+
     public void stopCoral() {
         coralMotor.set(0);
     }

@@ -25,9 +25,11 @@ import frc.robot.commands.Algae.AlgaeArmsBarf;
 import frc.robot.commands.Algae.AlgaeArmsMoveDown;
 import frc.robot.commands.Algae.AlgaeArmsMoveUp;
 import frc.robot.commands.Autos.Autos;
+import frc.robot.commands.Coral.EatCoral;
 import frc.robot.commands.Coral.IntakeCoral;
 import frc.robot.commands.Coral.ShootCoral;
 import frc.robot.commands.Coral.ShootCoralWait;
+import frc.robot.commands.Coral.SnortCoral;
 import frc.robot.commands.Coral.YeetCoral;
 import frc.robot.commands.Elevator.MoveElevatorToPos;
 import frc.robot.commands.Elevator.MoveElevatorToPosWithFinish;
@@ -117,13 +119,18 @@ public class RobotContainer {
     // Configure the trigger bindings
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
-    //NamedCommands.registerCommand("test", Commands.print("I EXIST"));
-    NamedCommands.registerCommand("FirstReefRight", new DeferredCommand(new SwervePathToAprilTagSupplier(1.0), Set.of(drivebase)));
-    NamedCommands.registerCommand("GoToFourthLevel", new MoveElevatorToPosWithFinish(elevator, 3, driveAngularVelocity));
-    NamedCommands.registerCommand("YeetCoral", new ShootCoralWait(0.5, coral, coralSensor).andThen(new YeetCoral(coral, coralSensor)));
-    NamedCommands.registerCommand("GoToBottomLevel", new MoveElevatorToPosWithFinish(elevator, 0, driveAngularVelocity));
+    // NamedCommands.registerCommand("test", Commands.print("I EXIST"));
+    NamedCommands.registerCommand("FirstReefRight",
+        new DeferredCommand(new SwervePathToAprilTagSupplier(1.0), Set.of(drivebase)));
+    NamedCommands.registerCommand("GoToFourthLevel",
+        new MoveElevatorToPosWithFinish(elevator, 3, driveAngularVelocity));
+    NamedCommands.registerCommand("YeetCoral",
+        new ShootCoralWait(0.5, coral, coralSensor).andThen(new YeetCoral(coral, coralSensor)));
+    NamedCommands.registerCommand("GoToBottomLevel",
+        new MoveElevatorToPosWithFinish(elevator, 0, driveAngularVelocity));
     NamedCommands.registerCommand("RunIntake", new IntakeCoral(coral, coralSensor));
-    NamedCommands.registerCommand("FirstReefLeft", new DeferredCommand(new SwervePathToAprilTagSupplier(-1.0), Set.of(drivebase)));
+    NamedCommands.registerCommand("FirstReefLeft",
+        new DeferredCommand(new SwervePathToAprilTagSupplier(-1.0), Set.of(drivebase)));
     Autos.load();
   }
 
@@ -171,36 +178,33 @@ public class RobotContainer {
       // driverXbox.x().onTrue(new MoveElevator(elevator, 0));
       // driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
       // driverXbox.b().whileTrue(
-      //     drivebase.driveToPose(
-      //         new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0))));
+      // drivebase.driveToPose(
+      // new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0))));
 
       driverXbox.start().onTrue((Commands.print("drivebase::zeroGyro").andThen(drivebase::zeroGyroWithAlliance)));
       driverXbox.back().whileTrue(Commands.none());
       driverXbox.rightTrigger().whileTrue(new ShootCoral(coral, coralSensor));
       driverXbox.rightBumper().whileTrue(new IntakeCoral(coral, coralSensor));
-      driverXbox.leftTrigger().whileTrue(new AlgaeArmsMoveDown(algaeExtractor));
-      driverXbox.leftBumper().onTrue(new AlgaeArmsMoveUp(algaeExtractor));
+      driverXbox.leftTrigger().whileTrue(new SnortCoral(coral, coralSensor));
       driverXbox.a().whileTrue(new AlgaeArmsBarf(algaeExtractor));
-      driverXbox.y().onTrue(Commands.run(()->{elevator.childSafetyEnabled = false;}));
-
+      driverXbox.y().onTrue(Commands.run(() -> {
+        elevator.childSafetyEnabled = false;
+      }));
+      // Lift Buttons
       driverXbox.povUp().whileTrue(new MoveLiftUp(lift));
       driverXbox.povDown().whileTrue(new MoveLiftDown(lift));
 
       driverXbox.povRight().whileTrue(
-              new ConditionalCommand(
-                      new DeferredCommand(new SwervePathToAprilTagSupplier(1.0), Set.of(drivebase)),
-                      new StrafeAndMoveForward(drivebase, driveStrafeRight),
-                      drivebase::seesAprilTag
-              )
-      );
+          new ConditionalCommand(
+              new DeferredCommand(new SwervePathToAprilTagSupplier(1.0), Set.of(drivebase)),
+              new StrafeAndMoveForward(drivebase, driveStrafeRight),
+              drivebase::seesAprilTag));
 
       driverXbox.povLeft().whileTrue(
-              new ConditionalCommand(
-                      new DeferredCommand(new SwervePathToAprilTagSupplier(-1.0), Set.of(drivebase)),
-                      new StrafeAndMoveForward(drivebase, driveStrafeLeft),
-                      drivebase::seesAprilTag
-              )
-      );
+          new ConditionalCommand(
+              new DeferredCommand(new SwervePathToAprilTagSupplier(-1.0), Set.of(drivebase)),
+              new StrafeAndMoveForward(drivebase, driveStrafeLeft),
+              drivebase::seesAprilTag));
 
       driverXbox.b().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
 
@@ -218,7 +222,7 @@ public class RobotContainer {
   private void setResetCommandLevelButton(int level, int buttonNum) {
     var command = new MoveElevatorToPos(elevator, level, driveAngularVelocity);
     buttonBox.button(buttonNum).onTrue(new InstantCommand(() -> {
-      if(command.isScheduled()) {
+      if (command.isScheduled()) {
         command.cancel();
       }
       command.schedule();
