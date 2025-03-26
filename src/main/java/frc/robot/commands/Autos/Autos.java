@@ -31,10 +31,16 @@ public final class Autos {
 
                 
         commandChooser.addOption("Reef Top",
-                RobotContainer.drivebase.getAutonomousCommand("Reef_Top"));
+                RobotContainer.drivebase.getAutonomousCommand("Top_Reef"));
+
+            commandChooser.addOption("Quicker Reef Top",
+                RobotContainer.drivebase.getAutonomousCommand("QuickTop_Reef"));
             
         commandChooser.addOption("Reef Bottom",
-                RobotContainer.drivebase.getAutonomousCommand("Reef_Bottom"));
+                RobotContainer.drivebase.getAutonomousCommand("Bottom_Reef"));
+        
+        commandChooser.addOption("Reef Straight",
+                RobotContainer.drivebase.getAutonomousCommand("Straight_To_Reef"));
 
         SmartDashboard.putData("Command Selected", commandChooser);
     }
