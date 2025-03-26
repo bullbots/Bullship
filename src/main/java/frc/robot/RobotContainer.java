@@ -28,7 +28,9 @@ import frc.robot.commands.Autos.Autos;
 import frc.robot.commands.Coral.IntakeCoral;
 import frc.robot.commands.Coral.ShootCoral;
 import frc.robot.commands.Coral.ShootCoralWait;
+import frc.robot.commands.Coral.YeetCoral;
 import frc.robot.commands.Elevator.MoveElevatorToPos;
+import frc.robot.commands.Elevator.MoveElevatorToPosWithFinish;
 import frc.robot.commands.Lift.MoveLiftDown;
 import frc.robot.commands.Lift.MoveLiftUp;
 import frc.robot.commands.StrafeAndMoveForward;
@@ -115,15 +117,17 @@ public class RobotContainer {
     // Configure the trigger bindings
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
-    NamedCommands.registerCommand("test", Commands.print("I EXIST"));
+    //NamedCommands.registerCommand("test", Commands.print("I EXIST"));
     NamedCommands.registerCommand("FirstReefRight", new DeferredCommand(new SwervePathToAprilTagSupplier(1.0), Set.of(drivebase)));
-    NamedCommands.registerCommand("GoToFourthLevel", new MoveElevatorToPos(elevator, 3, driveAngularVelocity));
-    
+    NamedCommands.registerCommand("GoToFourthLevel", new MoveElevatorToPosWithFinish(elevator, 3, driveAngularVelocity));
+    NamedCommands.registerCommand("YeetCoral", new ShootCoralWait(0.5, coral, coralSensor).andThen(new YeetCoral(coral, coralSensor)));
+    NamedCommands.registerCommand("GoToBottomLevel", new MoveElevatorToPosWithFinish(elevator, 0, driveAngularVelocity));
+    NamedCommands.registerCommand("RunIntake", new IntakeCoral(coral, coralSensor));
+    NamedCommands.registerCommand("FirstReefLeft", new DeferredCommand(new SwervePathToAprilTagSupplier(-1.0), Set.of(drivebase)));
     Autos.load();
   }
 
   /**
-   * 
    * Use this method to define your trigger->command mappings. Triggers can be
    * created via the
    * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with
