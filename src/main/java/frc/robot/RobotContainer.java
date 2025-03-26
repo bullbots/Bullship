@@ -25,7 +25,6 @@ import frc.robot.commands.Algae.AlgaeArmsBarf;
 import frc.robot.commands.Algae.AlgaeArmsMoveDown;
 import frc.robot.commands.Algae.AlgaeArmsMoveUp;
 import frc.robot.commands.Autos.Autos;
-import frc.robot.commands.Coral.EatCoral;
 import frc.robot.commands.Coral.IntakeCoral;
 import frc.robot.commands.Coral.ShootCoral;
 import frc.robot.commands.Coral.ShootCoralWait;
