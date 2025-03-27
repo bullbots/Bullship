@@ -69,7 +69,7 @@ public class RobotContainer {
 
   public static final Lift lift = new Lift();
 
-  //public static final AlgaeExtractor algaeExtractor = new AlgaeExtractor();
+  // public static final AlgaeExtractor algaeExtractor = new AlgaeExtractor();
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled
    * by angular velocity.
@@ -189,7 +189,8 @@ public class RobotContainer {
       driverXbox.leftBumper().whileTrue(new Command() {
         @Override
         public void initialize() {
-          driveAngularVelocity.scaleTranslation(0.2);}
+          driveAngularVelocity.scaleTranslation(0.2);
+        }
 
         @Override
         public void end(boolean interrupted) {
@@ -197,8 +198,8 @@ public class RobotContainer {
         }
       }
 
-        );
-      //driverXbox.a().whileTrue(new AlgaeArmsBarf(algaeExtractor));
+      );
+      // driverXbox.a().whileTrue(new AlgaeArmsBarf(algaeExtractor));
       driverXbox.y().onTrue(Commands.run(() -> {
         elevator.childSafetyEnabled = false;
       }));
@@ -208,19 +209,24 @@ public class RobotContainer {
 
       driverXbox.povRight().whileTrue(
           new ConditionalCommand(
-              new ParallelDeadlineGroup(new DeferredCommand(new SwervePathToAprilTagSupplier(1.0, true, true), Set.of(drivebase)), new ControllerVibrate(50)),
+              new ParallelDeadlineGroup(
+                  new DeferredCommand(new SwervePathToAprilTagSupplier(1.0, true, true), Set.of(drivebase)),
+                  new ControllerVibrate(50)),
               new StrafeAndMoveForward(drivebase, driveStrafeRight),
               drivebase::seesAprilTag));
 
       driverXbox.povLeft().whileTrue(
           new ConditionalCommand(
-              new ParallelDeadlineGroup(new DeferredCommand(new SwervePathToAprilTagSupplier(-1.0, true, true), Set.of(drivebase)), new ControllerVibrate(50)),
+              new ParallelDeadlineGroup(
+                  new DeferredCommand(new SwervePathToAprilTagSupplier(-1.0, true, true), Set.of(drivebase)),
+                  new ControllerVibrate(50)),
               new StrafeAndMoveForward(drivebase, driveStrafeLeft),
               drivebase::seesAprilTag));
 
-
-      driverXbox.a().whileTrue(new ParallelDeadlineGroup(new DeferredCommand(new SwervePathToAprilTagSupplier(0.0, true, true), Set.of(drivebase)), new ControllerVibrate(50))
-      );
+      driverXbox.a()
+          .whileTrue(new ParallelDeadlineGroup(
+              new DeferredCommand(new SwervePathToAprilTagSupplier(0.0, true, true), Set.of(drivebase)),
+              new ControllerVibrate(50)));
       driverXbox.b().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
 
       // Coral levels
