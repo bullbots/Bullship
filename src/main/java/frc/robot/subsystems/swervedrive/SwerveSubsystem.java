@@ -197,12 +197,17 @@ public class SwerveSubsystem extends SubsystemBase {
     if (mt2.tagCount == 0) {
       return;
     } 
-
-    // if (RobotState.isEnabled()) {
-      var poseEstimate = getBlueBotPoseEstimate();
-      var distance = poseEstimate.getTranslation().getDistance(mt2.pose.getTranslation());
-      
+    var poseEstimate = getBlueBotPoseEstimate();
+    var distance = poseEstimate.getTranslation().getDistance(mt2.pose.getTranslation());
+    
+    if (RobotState.isEnabled()) {
       if (Math.abs(distance) <= 1.0) {
+        swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
+        swerveDrive.swerveDrivePoseEstimator.addVisionMeasurement(
+            mt2.pose,
+            mt2.timestampSeconds);
+      }
+      }else{
         swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
         swerveDrive.swerveDrivePoseEstimator.addVisionMeasurement(
             mt2.pose,
@@ -651,7 +656,8 @@ public class SwerveSubsystem extends SubsystemBase {
     if (isRedAlliance()) {
       zeroGyro();
       // Set the pose 180 degrees
-      //resetOdometry(new Pose2d(getPose().getTranslation(), Rotation2d.fromDegrees(180)));
+      // resetOdometry(new Pose2d(getPose().getTranslation(),
+      // Rotation2d.fromDegrees(180)));
     } else {
       zeroGyro();
       resetOdometry(new Pose2d(getPose().getTranslation(), Rotation2d.fromDegrees(180)));
@@ -792,12 +798,13 @@ public class SwerveSubsystem extends SubsystemBase {
     // replace void with correct var
     return swerveDrive.swerveDrivePoseEstimator.getEstimatedPosition();
   }
-  public boolean seesAprilTag(){
+
+  public boolean seesAprilTag() {
     LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-aprilta");
     if (mt2 == null) {
       return false;
     }
-    return mt2.tagCount !=0;
+    return mt2.tagCount != 0;
   }
 
   public Optional<Pose3d> getAprilTagPose(int ID) {

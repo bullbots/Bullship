@@ -23,8 +23,13 @@ import frc.robot.RobotContainer;
 public class SwervePathToAprilTagSupplier implements Supplier<Command>{
     
     private double direction;
-    public SwervePathToAprilTagSupplier(double direction){
+    private boolean isSlow;
+    private boolean shouldCheck;
+    private double speed =.35;
+    public SwervePathToAprilTagSupplier(double direction, boolean isSlow, boolean shouldCheck){
         this.direction = direction;
+        this.isSlow = isSlow;
+        this.shouldCheck = shouldCheck;
 
     } 
     @Override
@@ -32,7 +37,7 @@ public class SwervePathToAprilTagSupplier implements Supplier<Command>{
         System.out.printf("SwervePathToAprilTagSupplier.get() %f%n", direction);
 
         var drivebase = RobotContainer.drivebase;
-        if(drivebase.seesAprilTag()){
+        if(drivebase.seesAprilTag() && shouldCheck){
           
             // var cur_pose = drivebase.getPose();
             // System.out.printf("pose: %s%n", cur_pose);
@@ -40,11 +45,12 @@ public class SwervePathToAprilTagSupplier implements Supplier<Command>{
             // drivebase.resetOdometry(poseEstimate);
             // cur_pose = drivebase.getPose();
             // System.out.printf("poseEstimate: %s%n", poseEstimate);
-
-          
+            if(isSlow){
+                speed = .2;
+            }
             PathConstraints constraints;
             constraints = new PathConstraints(
-                    drivebase.getSwerveDrive().getMaximumChassisVelocity()*.50, 4.0,
+                    drivebase.getSwerveDrive().getMaximumChassisVelocity()*speed, 4.0,
                     drivebase.getSwerveDrive().getMaximumChassisAngularVelocity(), Units.degreesToRadians(720));
             
             // var targetPose = LimelightHelpers.getTargetPose_RobotSpace("limelight");

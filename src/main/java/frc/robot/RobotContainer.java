@@ -34,6 +34,7 @@ import frc.robot.commands.Elevator.MoveElevatorToPos;
 import frc.robot.commands.Elevator.MoveElevatorToPosWithFinish;
 import frc.robot.commands.Lift.MoveLiftDown;
 import frc.robot.commands.Lift.MoveLiftUp;
+import frc.robot.commands.ControllerVibrate;
 import frc.robot.commands.StrafeAndMoveForward;
 import frc.robot.commands.swervedrive.SwervePathToAprilTagSupplier;
 import frc.robot.subsystems.AlgaeExtractor;
@@ -120,7 +121,7 @@ public class RobotContainer {
     DriverStation.silenceJoystickConnectionWarning(true);
     // NamedCommands.registerCommand("test", Commands.print("I EXIST"));
     NamedCommands.registerCommand("FirstReefRight",
-        new DeferredCommand(new SwervePathToAprilTagSupplier(1.0), Set.of(drivebase)));
+        new DeferredCommand(new SwervePathToAprilTagSupplier(1.0, false, true), Set.of(drivebase)));
     NamedCommands.registerCommand("GoToFourthLevel",
         new MoveElevatorToPosWithFinish(elevator, 3, driveAngularVelocity));
     NamedCommands.registerCommand("YeetCoral",
@@ -129,7 +130,7 @@ public class RobotContainer {
         new MoveElevatorToPosWithFinish(elevator, 0, driveAngularVelocity));
     NamedCommands.registerCommand("RunIntake", new IntakeCoral(coral, coralSensor));
     NamedCommands.registerCommand("FirstReefLeft",
-        new DeferredCommand(new SwervePathToAprilTagSupplier(-1.0), Set.of(drivebase)));
+        new DeferredCommand(new SwervePathToAprilTagSupplier(-1.0, false, false), Set.of(drivebase)));
     Autos.load();
   }
 
@@ -185,6 +186,18 @@ public class RobotContainer {
       driverXbox.rightTrigger().whileTrue(new ShootCoral(coral, coralSensor));
       driverXbox.rightBumper().whileTrue(new IntakeCoral(coral, coralSensor));
       driverXbox.leftTrigger().whileTrue(new SnortCoral(coral, coralSensor));
+      driverXbox.leftBumper().whileTrue(new Command() {
+        @Override
+        public void initialize() {
+          driveAngularVelocity.scaleTranslation(0.2);}
+
+        @Override
+        public void end(boolean interrupted) {
+          driveAngularVelocity.scaleTranslation(0.8);
+        }
+      }
+
+        );
       //driverXbox.a().whileTrue(new AlgaeArmsBarf(algaeExtractor));
       driverXbox.y().onTrue(Commands.run(() -> {
         elevator.childSafetyEnabled = false;
@@ -195,16 +208,19 @@ public class RobotContainer {
 
       driverXbox.povRight().whileTrue(
           new ConditionalCommand(
-              new DeferredCommand(new SwervePathToAprilTagSupplier(1.0), Set.of(drivebase)),
+              new ParallelDeadlineGroup(new DeferredCommand(new SwervePathToAprilTagSupplier(1.0, true, true), Set.of(drivebase)), new ControllerVibrate(50)),
               new StrafeAndMoveForward(drivebase, driveStrafeRight),
               drivebase::seesAprilTag));
 
       driverXbox.povLeft().whileTrue(
           new ConditionalCommand(
-              new DeferredCommand(new SwervePathToAprilTagSupplier(-1.0), Set.of(drivebase)),
+              new ParallelDeadlineGroup(new DeferredCommand(new SwervePathToAprilTagSupplier(-1.0, true, true), Set.of(drivebase)), new ControllerVibrate(50)),
               new StrafeAndMoveForward(drivebase, driveStrafeLeft),
               drivebase::seesAprilTag));
 
+
+      driverXbox.a().whileTrue(new ParallelDeadlineGroup(new DeferredCommand(new SwervePathToAprilTagSupplier(0.0, true, true), Set.of(drivebase)), new ControllerVibrate(50))
+      );
       driverXbox.b().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
 
       // Coral levels
