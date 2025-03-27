@@ -68,7 +68,7 @@ public class RobotContainer {
 
   public static final Lift lift = new Lift();
 
-  public static final AlgaeExtractor algaeExtractor = new AlgaeExtractor();
+  //public static final AlgaeExtractor algaeExtractor = new AlgaeExtractor();
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled
    * by angular velocity.
@@ -185,7 +185,7 @@ public class RobotContainer {
       driverXbox.rightTrigger().whileTrue(new ShootCoral(coral, coralSensor));
       driverXbox.rightBumper().whileTrue(new IntakeCoral(coral, coralSensor));
       driverXbox.leftTrigger().whileTrue(new SnortCoral(coral, coralSensor));
-      driverXbox.a().whileTrue(new AlgaeArmsBarf(algaeExtractor));
+      //driverXbox.a().whileTrue(new AlgaeArmsBarf(algaeExtractor));
       driverXbox.y().onTrue(Commands.run(() -> {
         elevator.childSafetyEnabled = false;
       }));

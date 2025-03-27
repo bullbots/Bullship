@@ -27,13 +27,13 @@ public class MoveElevatorToPos extends Command {
 
         System.out.println("MoveElevator.initialize ");
 
-        if (m_ElevatorSubsystem.currentLevel==0 && m_ElevatorSubsystem.childSafetyEnabled && RobotContainer.coralSensor.get() && !RobotContainer.algaeExtractor.armsOut){
+        if (m_ElevatorSubsystem.currentLevel==0 && m_ElevatorSubsystem.childSafetyEnabled && RobotContainer.coralSensor.get()){
             if (RobotContainer.coralSensor.get()){
                 System.out.println("no coral detected!!!!!!!!!!!!!!!!!!!!!!!!!");
             }
-            if (!RobotContainer.algaeExtractor.armsOut){
-                System.out.println("Arms in!!!!!!!!!!!!!!!!!!!!");
-            }
+            //if (!RobotContainer.algaeExtractor.armsOut){
+                //System.out.println("Arms in!!!!!!!!!!!!!!!!!!!!");
+            //}
             return;
         }
         m_ElevatorSubsystem.moveToLevel(m_level);
