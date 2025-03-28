@@ -37,7 +37,7 @@ public class SwervePathToAprilTagSupplier implements Supplier<Command>{
         System.out.printf("SwervePathToAprilTagSupplier.get() %f%n", direction);
 
         var drivebase = RobotContainer.drivebase;
-        if(drivebase.seesAprilTag() && shouldCheck){
+        if(drivebase.seesAprilTag()){
           
             // var cur_pose = drivebase.getPose();
             // System.out.printf("pose: %s%n", cur_pose);

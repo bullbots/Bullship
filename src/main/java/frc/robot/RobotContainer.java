@@ -122,6 +122,8 @@ public class RobotContainer {
     // NamedCommands.registerCommand("test", Commands.print("I EXIST"));
     NamedCommands.registerCommand("FirstReefRight",
         new DeferredCommand(new SwervePathToAprilTagSupplier(1.0, false, true), Set.of(drivebase)));
+    NamedCommands.registerCommand("SecondReefRight",
+        new DeferredCommand(new SwervePathToAprilTagSupplier(1.0, false, false), Set.of(drivebase)));
     NamedCommands.registerCommand("GoToFourthLevel",
         new MoveElevatorToPosWithFinish(elevator, 3, driveAngularVelocity));
     NamedCommands.registerCommand("YeetCoral",
@@ -130,8 +132,9 @@ public class RobotContainer {
         new MoveElevatorToPosWithFinish(elevator, 0, driveAngularVelocity));
     NamedCommands.registerCommand("RunIntake", new IntakeCoral(coral, coralSensor));
     NamedCommands.registerCommand("FirstReefLeft",
-        new DeferredCommand(new SwervePathToAprilTagSupplier(-1.0, false, false), Set.of(drivebase)));
+        new DeferredCommand(new SwervePathToAprilTagSupplier(-1.0, false, true), Set.of(drivebase)));
     Autos.load();
+
   }
 
   /**
