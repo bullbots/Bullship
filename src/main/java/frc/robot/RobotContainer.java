@@ -207,8 +207,8 @@ public class RobotContainer {
         elevator.childSafetyEnabled = false;
       }));
       // Lift Buttons
-      driverXbox.povUp().whileTrue(new MoveLiftUp(lift));
-      driverXbox.povDown().whileTrue(new MoveLiftDown(lift));
+      buttonBox.button(11).whileTrue(new MoveLiftUp(lift));
+      buttonBox.button(5).whileTrue(new MoveLiftDown(lift));
 
       driverXbox.povRight().whileTrue(
           new ConditionalCommand(
@@ -243,8 +243,8 @@ public class RobotContainer {
       setResetCommandLevelButton(2, 2);
       setResetCommandLevelButton(3, 1);
       // Algae levels
-      setResetCommandLevelButton(4, 5);
-      setResetCommandLevelButton(5, 11);
+      // setResetCommandLevelButton(4, 5);
+      // setResetCommandLevelButton(5, 11);
     }
   }
 
