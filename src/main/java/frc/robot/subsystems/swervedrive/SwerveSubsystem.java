@@ -157,7 +157,6 @@ public class SwerveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-
     if (!isInitialPoseSet) {
 
       LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-aprilta");
@@ -173,49 +172,68 @@ public class SwerveSubsystem extends SubsystemBase {
 
     } else {
 
-    // // When vision is enabled we must manually update odometry in SwerveDrive
-    // if (visionDriveTest) {
-    //   swerveDrive.updateOdometry();
-    //   vision.updatePoseEstimation(swerveDrive);
+      // // When vision is enabled we must manually update odometry in SwerveDrive
+      // if (visionDriveTest) {
+      //   swerveDrive.updateOdometry();
+      //   vision.updatePoseEstimation(swerveDrive);
 
-    // }
+      // }
 
-    limeLightRunner++;
-    if (limeLightRunner < 10) {
-      return;
-    }
-    limeLightRunner = 0;
-
-    LimelightHelpers.SetRobotOrientation("limelight-aprilta",
-        swerveDrive.swerveDrivePoseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
-    LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-aprilta");
-
-    if (mt2 == null) {
-      return;
-    }
-
-    if (mt2.tagCount == 0) {
-      return;
-    } 
-    var poseEstimate = getBlueBotPoseEstimate();
-    var distance = poseEstimate.getTranslation().getDistance(mt2.pose.getTranslation());
-    
-    if (RobotState.isEnabled()) {
-      if (Math.abs(distance) <= 1.0) {
-        swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
-        swerveDrive.swerveDrivePoseEstimator.addVisionMeasurement(
-            mt2.pose,
-            mt2.timestampSeconds);
+      limeLightRunner++;
+      if (limeLightRunner < 5) {
+        return;
       }
-      }else{
-        swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
+      limeLightRunner = 0;
+
+      LimelightHelpers.SetRobotOrientation("limelight-aprilta",
+              swerveDrive.swerveDrivePoseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
+      LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-aprilta");
+
+      if (mt2 == null) {
+        return;
+      }
+
+      if (mt2.tagCount == 0) {
+        return;
+      }
+
+      if (mt2.tagCount >= 2) { // Let's use mt1 because it's better with two tags.
+
+        LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-aprilta");
+        // This should not happen, but just in case.
+        if (mt1 == null || mt1.tagCount < 2) {
+          return;
+        }
+
+        swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.5,.5,9999999));
         swerveDrive.swerveDrivePoseEstimator.addVisionMeasurement(
-            mt2.pose,
-            mt2.timestampSeconds);
+                mt1.pose,
+                mt1.timestampSeconds);
+
+      } else {
+
+        var doUpdate = false;
+
+        if (RobotState.isEnabled()) {
+          var poseEstimate = getBlueBotPoseEstimate();
+          var distance = poseEstimate.getTranslation().getDistance(mt2.pose.getTranslation());
+          if (Math.abs(distance) <= 1.0) {
+            doUpdate = true;
+          }
+        } else {
+          doUpdate = true;
+        }
+
+        if (doUpdate) {
+          swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
+          swerveDrive.swerveDrivePoseEstimator.addVisionMeasurement(
+                  mt2.pose,
+                  mt2.timestampSeconds);
+        }
       }
     }
   }
-
+  
   @Override
   public void simulationPeriodic() {
   }
