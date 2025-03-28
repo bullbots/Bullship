@@ -126,6 +126,8 @@ public class RobotContainer {
         new DeferredCommand(new SwervePathToAprilTagSupplier(1.0, false, false), Set.of(drivebase)));
     NamedCommands.registerCommand("GoToFourthLevel",
         new MoveElevatorToPosWithFinish(elevator, 3, driveAngularVelocity));
+    NamedCommands.registerCommand("GoToSecondLevel",
+        new MoveElevatorToPosWithFinish(elevator, 1, driveAngularVelocity));
     NamedCommands.registerCommand("YeetCoral",
         new ShootCoralWait(0.5, coral, coralSensor).andThen(new YeetCoral(coral, coralSensor)));
     NamedCommands.registerCommand("GoToBottomLevel",
@@ -134,6 +136,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("FirstReefLeft",
         new DeferredCommand(new SwervePathToAprilTagSupplier(-1.0, false, true), Set.of(drivebase)));
     Autos.load();
+
 
   }
 
@@ -206,9 +209,6 @@ public class RobotContainer {
       driverXbox.y().onTrue(Commands.run(() -> {
         elevator.childSafetyEnabled = false;
       }));
-      // Lift Buttons
-      driverXbox.povUp().whileTrue(new MoveLiftUp(lift));
-      driverXbox.povDown().whileTrue(new MoveLiftDown(lift));
 
       driverXbox.povRight().whileTrue(
           new ConditionalCommand(
@@ -236,6 +236,8 @@ public class RobotContainer {
         elevator.childSafetyEnabled = false;
       }));
 
+      buttonBox.button(11).whileTrue(new MoveLiftUp(lift));
+      buttonBox.button(5).whileTrue(new MoveLiftDown(lift));
 
       // Coral levels
       setResetCommandLevelButton(0, 4);
@@ -243,8 +245,8 @@ public class RobotContainer {
       setResetCommandLevelButton(2, 2);
       setResetCommandLevelButton(3, 1);
       // Algae levels
-      setResetCommandLevelButton(4, 5);
-      setResetCommandLevelButton(5, 11);
+      // setResetCommandLevelButton(4, 5);
+      // setResetCommandLevelButton(5, 11);
     }
   }
 

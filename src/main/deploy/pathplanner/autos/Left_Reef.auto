@@ -7,6 +7,12 @@
         {
           "type": "named",
           "data": {
+            "name": "GoToSecondLevel"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
             "name": "FirstReefRight"
           }
         },
@@ -43,6 +49,12 @@
         {
           "type": "named",
           "data": {
+            "name": "GoToSecondLevel"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
             "name": "SecondReefRight"
           }
         },
@@ -74,6 +86,12 @@
           "type": "named",
           "data": {
             "name": "RunIntake"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "GoToSecondLevel"
           }
         },
         {
