@@ -50,6 +50,7 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
 import frc.robot.LimelightHelpers;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.swervedrive.Vision.Cameras;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
@@ -132,6 +133,7 @@ public class SwerveSubsystem extends SubsystemBase {
     }
     setupPathPlanner();
     // RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyroWithAlliance));
+    RobotModeTriggers.teleop().onTrue(Commands.runOnce(()->{RobotContainer.elevator.childSafetyEnabled = true;}));
   }
 
   /**
@@ -233,7 +235,7 @@ public class SwerveSubsystem extends SubsystemBase {
       }
     }
   }
-  
+
   @Override
   public void simulationPeriodic() {
   }

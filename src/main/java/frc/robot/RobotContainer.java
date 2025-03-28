@@ -232,6 +232,11 @@ public class RobotContainer {
               new ControllerVibrate(50)));
       driverXbox.b().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
 
+      buttonBox.button(9).onTrue(Commands.run(() -> {
+        elevator.childSafetyEnabled = false;
+      }));
+
+
       // Coral levels
       setResetCommandLevelButton(0, 4);
       setResetCommandLevelButton(1, 3);
