@@ -190,8 +190,8 @@ public class SwerveSubsystem extends SubsystemBase {
       LimelightHelpers.SetRobotOrientation("limelight-aprilta",
               swerveDrive.swerveDrivePoseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
       LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-aprilta");
-
-      if (mt2 == null) {
+      LimelightHelpers.PoseEstimate mt2two = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-coral");
+      if (mt2 == null & mt2two  == null) {
         return;
       }
 
@@ -202,35 +202,62 @@ public class SwerveSubsystem extends SubsystemBase {
       if (mt2.tagCount >= 2) { // Let's use mt1 because it's better with two tags.
 
         LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-aprilta");
+        LimelightHelpers.PoseEstimate mt1two = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-coral");
+
         // This should not happen, but just in case.
-        if (mt1 == null || mt1.tagCount < 2) {
+        if ((mt1 == null && mt1two == null) || (mt1.tagCount < 2 && mt1two.tagCount < 2)) {
           return;
         }
-
-        swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.5,.5,9999999));
-        swerveDrive.swerveDrivePoseEstimator.addVisionMeasurement(
-                mt1.pose,
-                mt1.timestampSeconds);
-
+        if(mt1 != null){
+          swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.5,.5,9999999));
+          swerveDrive.swerveDrivePoseEstimator.addVisionMeasurement(
+                  mt1.pose,
+                  mt1.timestampSeconds);
+        }
+        if(mt1two != null){
+          swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.5,.5,9999999));
+          swerveDrive.swerveDrivePoseEstimator.addVisionMeasurement(
+                  mt1two.pose,
+                  mt1two.timestampSeconds);
+        }
       } else {
 
         var doUpdate = false;
-
-        if (RobotState.isEnabled()) {
-          var poseEstimate = getBlueBotPoseEstimate();
-          var distance = poseEstimate.getTranslation().getDistance(mt2.pose.getTranslation());
-          if (Math.abs(distance) <= 1.0) {
+        if (mt2 != null){
+          if (RobotState.isEnabled()) {
+            var poseEstimate = getBlueBotPoseEstimate();
+            var distance = poseEstimate.getTranslation().getDistance(mt2.pose.getTranslation());
+            if (Math.abs(distance) <= 1.0) {
+              doUpdate = true;
+            }
+          } else {
             doUpdate = true;
           }
-        } else {
-          doUpdate = true;
-        }
 
-        if (doUpdate) {
-          swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
-          swerveDrive.swerveDrivePoseEstimator.addVisionMeasurement(
-                  mt2.pose,
-                  mt2.timestampSeconds);
+          if (doUpdate) {
+            swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
+            swerveDrive.swerveDrivePoseEstimator.addVisionMeasurement(
+                    mt2.pose,
+                    mt2.timestampSeconds);
+          }
+        }
+        if (mt2two != null){
+          if (RobotState.isEnabled()) {
+            var poseEstimate = getBlueBotPoseEstimate();
+            var distance = poseEstimate.getTranslation().getDistance(mt2.pose.getTranslation());
+            if (Math.abs(distance) <= 1.0) {
+              doUpdate = true;
+            }
+          } else {
+            doUpdate = true;
+          }
+
+          if (doUpdate) {
+            swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
+            swerveDrive.swerveDrivePoseEstimator.addVisionMeasurement(
+                    mt2.pose,
+                    mt2.timestampSeconds);
+          }
         }
       }
     }
