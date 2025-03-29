@@ -191,11 +191,11 @@ public class SwerveSubsystem extends SubsystemBase {
               swerveDrive.swerveDrivePoseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
       LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-aprilta");
       LimelightHelpers.PoseEstimate mt2two = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-coral");
-      if (mt2 == null & mt2two  == null) {
+      if (mt2 == null && mt2two  == null) {
         return;
       }
 
-      if (mt2.tagCount == 0) {
+      if (mt2.tagCount == 0 && mt2two.tagCount == 0) {
         return;
       }
 
