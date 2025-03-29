@@ -54,7 +54,9 @@ public final class Constants {
 
   // Coral positions and Algea positions
   // 0 bottom, 2.01 second/trough, 0.98 is algae L1, 2.44 is algae L2
-  public static final double[] ElevatorLevelOffsets = { 0, 2.01, 3.58, 5.95, 0.98, 2.44 };
+  public static final double[] ElevatorLevelOffsets = { 0, 2.01, 3.58, 5.8
+    
+    \5, 0.98, 2.44 };
   public static final double AlgeaSetPosition = 8;
   public static final double AlgeaBarfPosition = 14.8;
   public static final double AlgeaHoldPosition = 6;

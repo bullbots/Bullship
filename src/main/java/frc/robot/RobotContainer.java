@@ -137,7 +137,6 @@ public class RobotContainer {
         new DeferredCommand(new SwervePathToAprilTagSupplier(-1.0, false, true), Set.of(drivebase)));
     Autos.load();
 
-
   }
 
   /**
@@ -209,6 +208,9 @@ public class RobotContainer {
       driverXbox.y().onTrue(Commands.run(() -> {
         elevator.childSafetyEnabled = false;
       }));
+      // Lift Buttons
+      buttonBox.button(11).whileTrue(new MoveLiftUp(lift));
+      buttonBox.button(5).whileTrue(new MoveLiftDown(lift));
 
       driverXbox.povRight().whileTrue(
           new ConditionalCommand(
@@ -236,8 +238,6 @@ public class RobotContainer {
         elevator.childSafetyEnabled = false;
       }));
 
-      buttonBox.button(11).whileTrue(new MoveLiftUp(lift));
-      buttonBox.button(5).whileTrue(new MoveLiftDown(lift));
 
       // Coral levels
       setResetCommandLevelButton(0, 4);
