@@ -190,6 +190,8 @@ public class SwerveSubsystem extends SubsystemBase {
       LimelightHelpers.SetRobotOrientation("limelight-aprilta",
               swerveDrive.swerveDrivePoseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
       LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-aprilta");
+      LimelightHelpers.SetRobotOrientation("limelight-coral",
+              swerveDrive.swerveDrivePoseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
       LimelightHelpers.PoseEstimate mt2two = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-coral");
       if (mt2 == null && mt2two  == null) {
         return;
@@ -203,7 +205,6 @@ public class SwerveSubsystem extends SubsystemBase {
 
         LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-aprilta");
         
-
         // This should not happen, but just in case.
         if ((mt1 == null) || (mt1.tagCount < 2)) {
           //return;
