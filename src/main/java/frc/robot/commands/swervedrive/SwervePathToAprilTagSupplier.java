@@ -16,8 +16,10 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
-import frc.robot.LimelightHelpers;
 import frc.robot.RobotContainer;
+import frc.robot.subsystems.swervedrive.Vision.Cameras;
+import org.photonvision.targeting.PhotonPipelineResult;
+import java.util.Optional;
 
 /** Add your docs here. */
 public class SwervePathToAprilTagSupplier implements Supplier<Command>{
@@ -50,10 +52,22 @@ public class SwervePathToAprilTagSupplier implements Supplier<Command>{
             // var targetPose = LimelightHelpers.getTargetPose_RobotSpace("limelight");
             // var results = LimelightHelpers.getLatestResults("limelight");
             // var fiducials = results.targets_Classifier;
-          
-            var id = LimelightHelpers.getFiducialID("limelight-aprilta");
-          
-            var aprilTagPose = drivebase.getAprilTagPose((int) id);
+
+            // Get the best target from any available camera
+            int id = -1;
+            for (Cameras camera : Cameras.values()) {
+              Optional<PhotonPipelineResult> result = camera.getLatestResult();
+              if (result.isPresent() && result.get().hasTargets()) {
+                id = result.get().getBestTarget().getFiducialId();
+                break;
+              }
+            }
+
+            if (id == -1) {
+              return new PrintCommand("no april tag !!");
+            }
+
+            var aprilTagPose = drivebase.getAprilTagPose(id);
           
             Pose2d aprilTag2d = new Pose2d(aprilTagPose.get().getX(), aprilTagPose.get().getY(), aprilTagPose.get().getRotation().toRotation2d());
             
