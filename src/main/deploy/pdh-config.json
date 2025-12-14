@@ -1,0 +1,114 @@
+{
+  "pdh": {
+    "moduleId": 1
+  },
+  "motorPorts": {
+    "backRightDrive": {
+      "canId": 1,
+      "pdhPort": 0,
+      "motorType": "TalonFX",
+      "subsystem": "Swerve",
+      "name": "Back Right Drive",
+      "currentThresholdMin": 3.0,
+      "currentThresholdMax": 20.0
+    },
+    "backRightAngle": {
+      "canId": 2,
+      "pdhPort": 1,
+      "motorType": "TalonFX",
+      "subsystem": "Swerve",
+      "name": "Back Right Angle",
+      "currentThresholdMin": 1.0,
+      "currentThresholdMax": 8.0
+    },
+    "backLeftDrive": {
+      "canId": 3,
+      "pdhPort": 2,
+      "motorType": "TalonFX",
+      "subsystem": "Swerve",
+      "name": "Back Left Drive",
+      "currentThresholdMin": 3.0,
+      "currentThresholdMax": 20.0
+    },
+    "backLeftAngle": {
+      "canId": 4,
+      "pdhPort": 3,
+      "motorType": "TalonFX",
+      "subsystem": "Swerve",
+      "name": "Back Left Angle",
+      "currentThresholdMin": 1.0,
+      "currentThresholdMax": 8.0
+    },
+    "frontRightDrive": {
+      "canId": 5,
+      "pdhPort": 4,
+      "motorType": "TalonFX",
+      "subsystem": "Swerve",
+      "name": "Front Right Drive",
+      "currentThresholdMin": 3.0,
+      "currentThresholdMax": 20.0
+    },
+    "frontRightAngle": {
+      "canId": 6,
+      "pdhPort": 5,
+      "motorType": "TalonFX",
+      "subsystem": "Swerve",
+      "name": "Front Right Angle",
+      "currentThresholdMin": 1.0,
+      "currentThresholdMax": 8.0
+    },
+    "frontLeftDrive": {
+      "canId": 7,
+      "pdhPort": 6,
+      "motorType": "TalonFX",
+      "subsystem": "Swerve",
+      "name": "Front Left Drive",
+      "currentThresholdMin": 3.0,
+      "currentThresholdMax": 20.0
+    },
+    "frontLeftAngle": {
+      "canId": 8,
+      "pdhPort": 7,
+      "motorType": "TalonFX",
+      "subsystem": "Swerve",
+      "name": "Front Left Angle",
+      "currentThresholdMin": 1.0,
+      "currentThresholdMax": 8.0
+    },
+    "elevator": {
+      "canId": 9,
+      "pdhPort": 8,
+      "motorType": "TalonFX",
+      "subsystem": "Elevator",
+      "name": "Elevator"
+    },
+    "coral": {
+      "canId": 10,
+      "pdhPort": 9,
+      "motorType": "SparkMax",
+      "subsystem": "Coral",
+      "name": "Coral Intake"
+    },
+    "algae": {
+      "canId": 11,
+      "pdhPort": 10,
+      "motorType": "SparkMax",
+      "subsystem": "Algae",
+      "name": "Algae Extractor"
+    },
+    "lift": {
+      "canId": 13,
+      "pdhPort": 11,
+      "motorType": "TalonFX",
+      "subsystem": "Lift",
+      "name": "Lift"
+    }
+  },
+  "testParameters": {
+    "testVoltage": 0.3,
+    "testDurationMs": 2000,
+    "currentThresholdMin": 0.5,
+    "currentThresholdMax": 40.0,
+    "stabilizationTimeMs": 500
+  }
+}

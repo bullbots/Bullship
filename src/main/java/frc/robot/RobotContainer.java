@@ -34,12 +34,14 @@ import frc.robot.commands.Elevator.MoveElevatorToPos;
 import frc.robot.commands.Elevator.MoveElevatorToPosWithFinish;
 import frc.robot.commands.Lift.MoveLiftDown;
 import frc.robot.commands.Lift.MoveLiftUp;
+import frc.robot.commands.MotorTest.SequentialMotorTestCommand;
 import frc.robot.commands.StrafeAndMoveForward;
 import frc.robot.commands.swervedrive.SwervePathToAprilTagSupplier;
 import frc.robot.subsystems.AlgaeExtractor;
 import frc.robot.subsystems.Coral;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Lift;
+import frc.robot.subsystems.PDHManager;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import swervelib.SwerveInputStream;
 
@@ -67,6 +69,8 @@ public class RobotContainer {
   public static final Coral coral = new Coral();
 
   public static final Lift lift = new Lift();
+
+  public static final PDHManager pdhManager = new PDHManager();
 
   //public static final AlgaeExtractor algaeExtractor = new AlgaeExtractor();
   /**
@@ -171,6 +175,7 @@ public class RobotContainer {
       driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
       driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
       driverXbox.back().whileTrue(drivebase.centerModulesCommand());
+      driverXbox.a().onTrue(new SequentialMotorTestCommand(pdhManager));
       driverXbox.leftBumper().onTrue(Commands.none());
       driverXbox.rightBumper().onTrue(Commands.none());
     } else {
