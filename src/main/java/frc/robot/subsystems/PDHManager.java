@@ -8,10 +8,9 @@ import frc.robot.config.PDHConfig;
 
 public class PDHManager extends SubsystemBase {
     private final PowerDistribution pdh;
-    private final PDHConfig config;
 
     public PDHManager() {
-        config = PDHConfig.load();
+        PDHConfig config = PDHConfig.load();
         pdh = new PowerDistribution(config.getPdhModuleId(), ModuleType.kRev);
 
         System.out.println("PDHManager initialized with PDH module ID: " + config.getPdhModuleId());

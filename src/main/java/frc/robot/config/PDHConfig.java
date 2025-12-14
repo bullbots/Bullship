@@ -23,6 +23,7 @@ public class PDHConfig {
         public int canId;
         public int pdhPort;
         public String motorType;
+        @SuppressWarnings("unused")
         public String subsystem;
         public String name;
         public Double currentThresholdMin;
@@ -68,6 +69,7 @@ public class PDHConfig {
             return instance;
         } catch (IOException e) {
             System.err.println("ERROR: Failed to load pdh-config.json");
+            //noinspection CallToPrintStackTrace
             e.printStackTrace();
             throw new RuntimeException("Could not load PDH configuration", e);
         }
@@ -85,6 +87,7 @@ public class PDHConfig {
         return testParameters;
     }
 
+    @SuppressWarnings("unused")
     public MotorConfig getMotorByCanId(int canId) {
         for (MotorConfig motor : motorPorts.values()) {
             if (motor.canId == canId) {

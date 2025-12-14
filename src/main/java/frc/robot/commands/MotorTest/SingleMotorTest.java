@@ -11,7 +11,6 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.config.PDHConfig;
 import frc.robot.config.PDHConfig.MotorConfig;
 import frc.robot.config.PDHConfig.TestParameters;
 import frc.robot.subsystems.PDHManager;
@@ -95,7 +94,7 @@ public class SingleMotorTest extends Command {
             result = analyzeResults();
         }
 
-        System.out.println("  " + result.toString());
+        System.out.println("  " + result);
 
         resultCallback.accept(result);
 

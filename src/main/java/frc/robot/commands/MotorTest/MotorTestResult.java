@@ -27,6 +27,7 @@ public class MotorTestResult {
         return motorName;
     }
 
+    @SuppressWarnings("unused")
     public int getCanId() {
         return canId;
     }
@@ -43,6 +44,7 @@ public class MotorTestResult {
         return failureReason;
     }
 
+    @SuppressWarnings("unused")
     public long getTimestamp() {
         return timestamp;
     }

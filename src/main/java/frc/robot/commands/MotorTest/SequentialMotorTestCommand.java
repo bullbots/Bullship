@@ -14,16 +14,15 @@ import java.util.Map;
 
 public class SequentialMotorTestCommand extends SequentialCommandGroup {
     private final List<MotorTestResult> results;
-    private int currentMotorIndex;
-    private int totalMotors;
+    private final int totalMotors;
 
     public SequentialMotorTestCommand(PDHManager pdhManager) {
         results = new ArrayList<>();
-        currentMotorIndex = 0;
 
         PDHConfig config = PDHConfig.load();
         Map<String, MotorConfig> motorPorts = config.getMotorPorts();
         totalMotors = motorPorts.size();
+        int currentMotorIndex = 0;
 
         System.out.println("===== Starting Motor Test Sequence =====");
         System.out.println("Total motors to test: " + totalMotors);
@@ -119,7 +118,7 @@ public class SequentialMotorTestCommand extends SequentialCommandGroup {
             System.out.println("\nFailed/Error Motors:");
             results.stream()
                 .filter(r -> r.getStatus() != MotorTestResult.Status.PASS)
-                .forEach(r -> System.out.println("  " + r.toString()));
+                .forEach(r -> System.out.println("  " + r));
         }
 
         System.out.println("===================================\n");

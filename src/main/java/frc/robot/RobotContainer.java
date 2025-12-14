@@ -11,7 +11,6 @@ import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -21,9 +20,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.Algae.AlgaeArmsBarf;
-import frc.robot.commands.Algae.AlgaeArmsMoveDown;
-import frc.robot.commands.Algae.AlgaeArmsMoveUp;
 import frc.robot.commands.Autos.Autos;
 import frc.robot.commands.Coral.IntakeCoral;
 import frc.robot.commands.Coral.ShootCoral;
@@ -37,7 +33,6 @@ import frc.robot.commands.Lift.MoveLiftUp;
 import frc.robot.commands.MotorTest.SequentialMotorTestCommand;
 import frc.robot.commands.StrafeAndMoveForward;
 import frc.robot.commands.swervedrive.SwervePathToAprilTagSupplier;
-import frc.robot.subsystems.AlgaeExtractor;
 import frc.robot.subsystems.Coral;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Lift;
@@ -89,6 +84,7 @@ public class RobotContainer {
    * Clone's the angular velocity input stream and converts it to a fieldRelative
    * input stream.
    */
+  @SuppressWarnings("unused")
   SwerveInputStream driveDirectAngle = driveAngularVelocity.copy().withControllerHeadingAxis(driverXbox::getRightX,
       driverXbox::getRightY)
       .headingWhile(true);
@@ -97,6 +93,7 @@ public class RobotContainer {
    * Clone's the angular velocity input stream and converts it to a robotRelative
    * input stream.
    */
+  @SuppressWarnings("unused")
   SwerveInputStream driveRobotOriented = driveAngularVelocity.copy().robotRelative(true)
       .allianceRelativeControl(false);
 
@@ -161,8 +158,6 @@ public class RobotContainer {
     }
 
     if (Robot.isSimulation()) {
-      Pose2d target = new Pose2d(new Translation2d(1, 4),
-          Rotation2d.fromDegrees(90));
       driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
       driverXbox.button(1).whileTrue(drivebase.sysIdDriveMotorCommand());
     }
@@ -191,9 +186,7 @@ public class RobotContainer {
       driverXbox.rightBumper().whileTrue(new IntakeCoral(coral, coralSensor));
       driverXbox.leftTrigger().whileTrue(new SnortCoral(coral, coralSensor));
       //driverXbox.a().whileTrue(new AlgaeArmsBarf(algaeExtractor));
-      driverXbox.y().onTrue(Commands.run(() -> {
-        elevator.childSafetyEnabled = false;
-      }));
+      driverXbox.y().onTrue(Commands.run(() -> elevator.childSafetyEnabled = false));
       // Lift Buttons
       driverXbox.povUp().whileTrue(new MoveLiftUp(lift));
       driverXbox.povDown().whileTrue(new MoveLiftDown(lift));
