@@ -23,15 +23,22 @@
           }
         },
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "GoToBottomLevel"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "ToCoralStationL"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "GoToBottomLevel"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "ToCoralStationL"
+                }
+              }
+            ]
           }
         },
         {
@@ -43,7 +50,7 @@
         {
           "type": "named",
           "data": {
-            "name": "FirstReefRight"
+            "name": "SecondReefRight"
           }
         },
         {
@@ -59,15 +66,22 @@
           }
         },
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "GoToBottomLevel"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "ToCoralStationL2"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "GoToBottomLevel"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "ToCoralStationL2"
+                }
+              }
+            ]
           }
         },
         {

@@ -18,7 +18,7 @@ public class Elevator extends SubsystemBase {
 
     private final TalonFX elevatorMotor;
     private final MotionMagicVoltage mmReq = new MotionMagicVoltage(0);
-    public boolean childSafetyEnabled = true;
+    public boolean childSafetyEnabled = false;
     private static final double TOLERANCE = 0.1;
 
     boolean locked = false;

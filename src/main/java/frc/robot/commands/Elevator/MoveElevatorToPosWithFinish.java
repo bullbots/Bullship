@@ -27,7 +27,7 @@ public class MoveElevatorToPosWithFinish extends Command {
 
         System.out.println("MoveElevator.initialize ");
 
-        if (m_ElevatorSubsystem.currentLevel== 0 && RobotContainer.coralSensor.get()){
+        if (m_ElevatorSubsystem.currentLevel== 0 && RobotContainer.coralSensor.get() && m_ElevatorSubsystem.childSafetyEnabled){
             if (RobotContainer.coralSensor.get()){
                 System.out.println("no coral detected!!!!!!!!!!!!!!!!!!!!!!!!!");
             }
@@ -44,7 +44,7 @@ public class MoveElevatorToPosWithFinish extends Command {
             scalefactor = 0.3;
 
         }
-        // driveAngularVelocity.scaleTranslation(scalefactor);
+        driveAngularVelocity.scaleTranslation(scalefactor);
     }
 
     @Override

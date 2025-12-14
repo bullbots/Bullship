@@ -29,18 +29,26 @@ public final class Autos {
         commandChooser.addOption("Drive Forward",
                 new DriveForward(3, RobotContainer.drivebase));
 
-                
-        commandChooser.addOption("Reef Top",
-                RobotContainer.drivebase.getAutonomousCommand("Top_Reef"));
+        commandChooser.addOption("Reef Left",
+                RobotContainer.drivebase.getAutonomousCommand("Left_Reef"));
 
-            commandChooser.addOption("Quicker Reef Top",
-                RobotContainer.drivebase.getAutonomousCommand("QuickTop_Reef"));
-            
-        commandChooser.addOption("Reef Bottom",
-                RobotContainer.drivebase.getAutonomousCommand("Bottom_Reef"));
-        
+        commandChooser.addOption("Quicker Reef Left",
+                RobotContainer.drivebase.getAutonomousCommand("QuickLeft_Reef"));
+
+        commandChooser.addOption("Reef Right",
+                RobotContainer.drivebase.getAutonomousCommand("Right_Reef"));
+
         commandChooser.addOption("Reef Straight",
                 RobotContainer.drivebase.getAutonomousCommand("Straight_To_Reef"));
+        
+        commandChooser.addOption("1 Reef Straight",
+                RobotContainer.drivebase.getAutonomousCommand("Straight_1_Coral"));
+
+        commandChooser.addOption("1 Reef Left",
+                RobotContainer.drivebase.getAutonomousCommand("Left_Reef_1"));        
+        
+        commandChooser.addOption("1 Reef Right",
+                RobotContainer.drivebase.getAutonomousCommand("Right_Reef_1"));  
 
         SmartDashboard.putData("Command Selected", commandChooser);
     }

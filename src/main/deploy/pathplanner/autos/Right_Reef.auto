@@ -31,7 +31,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "CoralStationFromStraight"
+            "pathName": "ToCoralStationR"
           }
         },
         {
@@ -67,7 +67,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "ToCoralStationL2"
+            "pathName": "ToCoralStationR2"
           }
         },
         {

@@ -62,7 +62,6 @@
       },
       "/SmartDashboard/Field": {
         "bottom": 1638,
-        "builtin": "2025 Reefscape",
         "height": 8.051901817321777,
         "left": 534,
         "right": 3466,
@@ -73,6 +72,9 @@
         }
       }
     }
+  },
+  "NetworkTables Info": {
+    "visible": true
   },
   "NetworkTables Settings": {
     "mode": "Client (NT4)",
@@ -93,7 +95,7 @@
             0.0,
             0.8500000238418579
           ],
-          "height": 338,
+          "height": 0,
           "series": [
             {
               "color": [

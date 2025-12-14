@@ -44,7 +44,7 @@ public class MoveElevatorToPos extends Command {
             scalefactor = 0.3;
 
         }
-        // driveAngularVelocity.scaleTranslation(scalefactor);
+        driveAngularVelocity.scaleTranslation(scalefactor);
     }
 
     @Override

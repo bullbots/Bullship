@@ -5,12 +5,6 @@
     "data": {
       "commands": [
         {
-          "type": "path",
-          "data": {
-            "pathName": "first_reef"
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "FirstReefRight"
@@ -19,13 +13,25 @@
         {
           "type": "named",
           "data": {
+            "name": "GoToFourthLevel"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
             "name": "YeetCoral"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "GoToBottomLevel"
           }
         }
       ]
     }
   },
-  "resetOdom": true,
+  "resetOdom": false,
   "folder": null,
   "choreoAuto": false
 }

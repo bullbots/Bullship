@@ -50,6 +50,7 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
 import frc.robot.LimelightHelpers;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.swervedrive.Vision.Cameras;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
@@ -132,6 +133,7 @@ public class SwerveSubsystem extends SubsystemBase {
     }
     setupPathPlanner();
     // RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyroWithAlliance));
+    RobotModeTriggers.teleop().onTrue(Commands.runOnce(()->{RobotContainer.elevator.childSafetyEnabled = true;}));
   }
 
   /**
@@ -157,7 +159,6 @@ public class SwerveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-
     if (!isInitialPoseSet) {
 
       LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-aprilta");
@@ -173,40 +174,72 @@ public class SwerveSubsystem extends SubsystemBase {
 
     } else {
 
-    // // When vision is enabled we must manually update odometry in SwerveDrive
-    // if (visionDriveTest) {
-    //   swerveDrive.updateOdometry();
-    //   vision.updatePoseEstimation(swerveDrive);
+      // // When vision is enabled we must manually update odometry in SwerveDrive
+      // if (visionDriveTest) {
+      //   swerveDrive.updateOdometry();
+      //   vision.updatePoseEstimation(swerveDrive);
 
-    // }
+      // }
 
-    limeLightRunner++;
-    if (limeLightRunner < 10) {
-      return;
-    }
-    limeLightRunner = 0;
+      limeLightRunner++;
+      if (limeLightRunner < 5) {
+        return;
+      }
+      limeLightRunner = 0;
 
-    LimelightHelpers.SetRobotOrientation("limelight-aprilta",
-        swerveDrive.swerveDrivePoseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
-    LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-aprilta");
+      // LimelightHelpers.SetRobotOrientation("limelight-aprilta",
+      //         swerveDrive.swerveDrivePoseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
+      LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-aprilta");
 
-    if (mt2 == null) {
-      return;
-    }
+      if (mt1 == null) {
+        return;
+      }
 
-    if (mt2.tagCount == 0) {
-      return;
-    } 
+      if (mt1.tagCount == 0) {
+        return;
+      }
 
-    // if (RobotState.isEnabled()) {
-      var poseEstimate = getBlueBotPoseEstimate();
-      var distance = poseEstimate.getTranslation().getDistance(mt2.pose.getTranslation());
-      
-      if (Math.abs(distance) <= 1.0) {
-        swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
+      if (mt1.tagCount >= 2) { // Let's use mt1 because it's better with two tags.
+
+        // LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-aprilta");
+        // This should not happen, but just in case.
+        // if (mt1 == null || mt1.tagCount < 2) {
+        //   return;
+        // }
+
+        swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.5,.5,9999999));
         swerveDrive.swerveDrivePoseEstimator.addVisionMeasurement(
-            mt2.pose,
-            mt2.timestampSeconds);
+                mt1.pose,
+                mt1.timestampSeconds);
+
+      } else {
+
+        var doRejectUpdate = false;
+        if(mt1.tagCount == 1 && mt1.rawFiducials.length == 1){
+
+          if(mt1.rawFiducials[0].ambiguity > .7)
+          {
+            doRejectUpdate = true;
+          }
+          if(mt1.rawFiducials[0].distToCamera > 3)
+          {
+            doRejectUpdate = true;
+          }
+          
+          if(mt1.tagCount == 0)
+          {
+            doRejectUpdate = true;
+          }
+
+          if(!doRejectUpdate)
+          {
+            swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.5,.5,9999999));
+            swerveDrive.swerveDrivePoseEstimator.addVisionMeasurement(
+                  mt1.pose,
+                  mt1.timestampSeconds);
+          }
+        }        
+      
       }
     }
   }
@@ -651,7 +684,8 @@ public class SwerveSubsystem extends SubsystemBase {
     if (isRedAlliance()) {
       zeroGyro();
       // Set the pose 180 degrees
-      //resetOdometry(new Pose2d(getPose().getTranslation(), Rotation2d.fromDegrees(180)));
+      // resetOdometry(new Pose2d(getPose().getTranslation(),
+      // Rotation2d.fromDegrees(180)));
     } else {
       zeroGyro();
       resetOdometry(new Pose2d(getPose().getTranslation(), Rotation2d.fromDegrees(180)));
@@ -802,12 +836,13 @@ public class SwerveSubsystem extends SubsystemBase {
     // replace void with correct var
     return swerveDrive.swerveDrivePoseEstimator.getEstimatedPosition();
   }
-  public boolean seesAprilTag(){
+
+  public boolean seesAprilTag() {
     LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-aprilta");
     if (mt2 == null) {
       return false;
     }
-    return mt2.tagCount !=0;
+    return mt2.tagCount != 0;
   }
 
   public Optional<Pose3d> getAprilTagPose(int ID) {
