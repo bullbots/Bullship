@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(findstr:*)",
+      "Bash(./gradlew build:*)",
+      "Bash(where:*)",
+      "Bash(dir \"C:\\\\Users\\\\Public\\\\wpilib\\\\2026\\\\jdk\\\\bin\\\\java.exe\")",
+      "Bash(dir:*)",
+      "Bash(set JAVA_HOME=C:UsersPublicwpilib2026jdk)",
+      "Bash(set PATH=%JAVA_HOME%bin)",
+      "Bash(%PATH%)",
+      "Bash(cmd.exe /c \"set JAVA_HOME=C:\\\\Users\\\\Public\\\\wpilib\\\\2026\\\\jdk && set PATH=%JAVA_HOME%\\\\bin;%PATH% && gradlew.bat build --stacktrace\")",
+      "Bash(cmd.exe /c \"dir gradlew.bat\")",
+      "Bash(cmd.exe /c \"set JAVA_HOME=C:\\\\Users\\\\Public\\\\wpilib\\\\2026\\\\jdk && gradlew.bat build\")",
+      "Bash(curl:*)",
+      "Bash(grep:*)",
+      "Bash(./gradlew clean:*)",
+      "Bash(jar tf:*)"
+    ]
+  }
+}

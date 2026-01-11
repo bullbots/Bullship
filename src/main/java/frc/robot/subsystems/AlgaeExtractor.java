@@ -12,7 +12,6 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
@@ -55,9 +54,9 @@ public class AlgaeExtractor extends SubsystemBase {
     /*
      * Configure the closed loop controller. We want to make sure we set the
      * feedback sensor as the primary encoder.
+     * NOTE: In REVLib 2026, the primary encoder is used by default
      */
     config.closedLoop
-        .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         // Set PID values for position control. We don't need to pass a closed
         // loop slot, as it will default to slot 0.
         .p(0.4)
