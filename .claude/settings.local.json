@@ -15,7 +15,8 @@
       "Bash(curl:*)",
       "Bash(grep:*)",
       "Bash(./gradlew clean:*)",
-      "Bash(jar tf:*)"
+      "Bash(jar tf:*)",
+      "Bash(./gradlew simulateJava:*)"
     ]
   }
 }
