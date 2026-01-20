@@ -22,6 +22,7 @@ import edu.wpi.first.networktables.NetworkTablesJNI;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import frc.robot.Constants.VisionConstants;
 import frc.robot.Robot;
 import java.awt.Desktop;
 import java.util.ArrayList;
@@ -52,7 +53,7 @@ public class Vision {
    * April Tag Field Layout of the year.
    */
   public static final AprilTagFieldLayout fieldLayout = AprilTagFieldLayout
-      .loadField(AprilTagFields.k2025ReefscapeWelded);
+      .loadField(AprilTagFields.k2025ReefscapeAndyMark);
   /**
    * Ambiguity defined as a value between (0,1). Used in
    * {@link Vision#filterPose}.
@@ -307,32 +308,23 @@ public class Vision {
    */
   enum Cameras {
     /**
-     * Left Camera
+     * Front Left Camera
      */
-    LEFT_CAM("left",
-        new Rotation3d(0, Math.toRadians(-24.094), Math.toRadians(30)),
-        new Translation3d(Units.inchesToMeters(12.056),
-            Units.inchesToMeters(10.981),
-            Units.inchesToMeters(8.44)),
-        VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
+    FRONT_LEFT_CAM(
+        VisionConstants.FRONT_LEFT_CAMERA_NAME,
+        VisionConstants.FRONT_LEFT_CAMERA_ROTATION,
+        VisionConstants.FRONT_LEFT_CAMERA_POSITION,
+        VisionConstants.SINGLE_TAG_STD_DEVS,
+        VisionConstants.MULTI_TAG_STD_DEVS),
     /**
-     * Right Camera
+     * Front Right Camera
      */
-    RIGHT_CAM("right",
-        new Rotation3d(0, Math.toRadians(-24.094), Math.toRadians(-30)),
-        new Translation3d(Units.inchesToMeters(12.056),
-            Units.inchesToMeters(-10.981),
-            Units.inchesToMeters(8.44)),
-        VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
-    /**
-     * Center Camera
-     */
-    CENTER_CAM("center",
-        new Rotation3d(0, Units.degreesToRadians(18), 0),
-        new Translation3d(Units.inchesToMeters(-4.628),
-            Units.inchesToMeters(-10.687),
-            Units.inchesToMeters(16.129)),
-        VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1));
+    FRONT_RIGHT_CAM(
+        VisionConstants.FRONT_RIGHT_CAMERA_NAME,
+        VisionConstants.FRONT_RIGHT_CAMERA_ROTATION,
+        VisionConstants.FRONT_RIGHT_CAMERA_POSITION,
+        VisionConstants.SINGLE_TAG_STD_DEVS,
+        VisionConstants.MULTI_TAG_STD_DEVS);
 
     /**
      * Latency alert to use when high latency is detected.
@@ -416,14 +408,12 @@ public class Vision {
 
       if (Robot.isSimulation()) {
         SimCameraProperties cameraProp = new SimCameraProperties();
-        // A 640 x 480 camera with a 100 degree diagonal FOV.
-        cameraProp.setCalibration(960, 720, Rotation2d.fromDegrees(100));
-        // Approximate detection noise with average and standard deviation error in
-        // pixels.
-        cameraProp.setCalibError(0.25, 0.08);
-        // Set the camera image capture framerate (Note: this is limited by robot loop
-        // rate).
-        cameraProp.setFPS(30);
+        // Arducam OV9281 - 640x480 @ 100 FPS with estimated 90 degree diagonal FOV
+        cameraProp.setCalibration(640, 480, Rotation2d.fromDegrees(90));
+        // Approximate detection noise matching calibration error (avg ~41px from your config)
+        cameraProp.setCalibError(0.35, 0.10);
+        // Set the camera image capture framerate to match actual cameras
+        cameraProp.setFPS(100);
         // The average and standard deviation in milliseconds of image data latency.
         cameraProp.setAvgLatencyMs(35);
         cameraProp.setLatencyStdDevMs(5);

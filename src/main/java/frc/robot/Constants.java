@@ -4,7 +4,12 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import swervelib.math.Matter;
 
@@ -75,5 +80,41 @@ public final class Constants {
 
     public static final int kDriverControllerPort = 0;
     public static final int kCopilotControllerPort = 1;
+  }
+
+  public static class VisionConstants {
+
+    // Camera names (must match PhotonVision configuration)
+    public static final String FRONT_LEFT_CAMERA_NAME = "FrontLeftCamera";
+    public static final String FRONT_RIGHT_CAMERA_NAME = "FrontRightCamera";
+
+    // Front Left Camera Transform (relative to robot center)
+    public static final Translation3d FRONT_LEFT_CAMERA_POSITION = new Translation3d(
+        Units.inchesToMeters(12.056),  // X: forward from center
+        Units.inchesToMeters(10.981),  // Y: left from center
+        Units.inchesToMeters(8.44)     // Z: up from center
+    );
+    public static final Rotation3d FRONT_LEFT_CAMERA_ROTATION = new Rotation3d(
+        0,                              // Roll (no tilt)
+        0,                              // Pitch (horizontal, parallel to floor)
+        Math.toRadians(-24.15)          // Yaw (rotated 24.15° inward to the right)
+    );
+
+    // Front Right Camera Transform (relative to robot center)
+    public static final Translation3d FRONT_RIGHT_CAMERA_POSITION = new Translation3d(
+        Units.inchesToMeters(15.625),  // X: forward from center
+        Units.inchesToMeters(-11.375), // Y: right from center (negative)
+        Units.inchesToMeters(9)     // Z: up from center
+    );
+    public static final Rotation3d FRONT_RIGHT_CAMERA_ROTATION = new Rotation3d(
+        0,                              // Roll (no tilt)
+        0,                              // Pitch (horizontal, parallel to floor)
+        Math.toRadians(22.33)           // Yaw (rotated 22.33° inward to the left)
+    );
+
+    // Standard deviations for pose estimation
+    // Format: [x, y, theta] - increase values to trust vision less
+    public static final Matrix<N3, N1> SINGLE_TAG_STD_DEVS = VecBuilder.fill(4, 4, 8);
+    public static final Matrix<N3, N1> MULTI_TAG_STD_DEVS = VecBuilder.fill(0.5, 0.5, 1);
   }
 }
