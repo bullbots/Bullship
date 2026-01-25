@@ -41,6 +41,7 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import static edu.wpi.first.units.Units.Meter;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -75,8 +76,9 @@ public class SwerveSubsystem extends SubsystemBase {
       .loadField(AprilTagFields.k2025ReefscapeAndyMark);
   /**
    * Enable vision odometry updates while driving.
+   * Disabled in simulator to avoid interference with testing.
    */
-  private final boolean visionDriveTest = true;
+  private boolean visionDriveTest = false;
   /**
    * PhotonVision class to keep an accurate odometry.
    */
@@ -92,13 +94,19 @@ public class SwerveSubsystem extends SubsystemBase {
    * @param directory Directory of swerve drive config files.
    */
   public SwerveSubsystem(File directory) {
-    boolean blueAlliance = false;
-    Pose2d startingPose = blueAlliance ? new Pose2d(new Translation2d(Meter.of(1),
-        Meter.of(4)),
-        Rotation2d.fromDegrees(0))
-        : new Pose2d(new Translation2d(Meter.of(16),
-            Meter.of(4)),
-            Rotation2d.fromDegrees(180));
+    // Starting position for simulator - PhotonVision will correct this on real robot
+    var alliance = DriverStation.getAlliance();
+    boolean isBlue = !alliance.isPresent() || alliance.get() == DriverStation.Alliance.Blue;
+
+    Pose2d startingPose = isBlue
+        ? new Pose2d(Meter.of(7), Meter.of(7), Rotation2d.fromDegrees(-160))     // Blue: simulator position
+        : new Pose2d(Meter.of(9.64), Meter.of(7), Rotation2d.fromDegrees(20));   // Red: mirrored for red alliance
+
+    System.out.println("=== SWERVE SUBSYSTEM INIT ===");
+    System.out.println("Alliance: " + (isBlue ? "BLUE" : "RED"));
+    System.out.println("Starting Pose: X=" + startingPose.getX() + "m, Y=" + startingPose.getY() +
+                       "m, Rotation=" + startingPose.getRotation().getDegrees() + "°");
+    System.out.println("============================");
     // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary
     // objects being created.
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
@@ -125,6 +133,9 @@ public class SwerveSubsystem extends SubsystemBase {
     // swerveDrive.pushOffsetsToEncoders(); // Set the absolute encoder to be used
     // over the internal encoder and push the offsets onto it. Throws warning if not
     // possible
+
+    // Enable vision (including in simulator for testing)
+    visionDriveTest = true;
     if (visionDriveTest) {
       setupPhotonVision();
       // Stop the odometry thread if we are using vision that way we can synchronize
@@ -164,6 +175,9 @@ public class SwerveSubsystem extends SubsystemBase {
       swerveDrive.updateOdometry();
       vision.updatePoseEstimation(swerveDrive);
     }
+
+    // Update field widget with robot pose
+    swerveDrive.field.setRobotPose(getPose());
 
     // LIMELIGHT CODE - DISABLED FOR PHOTONVISION
     // if (!isInitialPoseSet) {
@@ -345,10 +359,20 @@ public class SwerveSubsystem extends SubsystemBase {
   public Command getAutonomousCommand(String pathName) {
     // Create a path following command using AutoBuilder. This will also trigger
     // event markers.
-    return new PathPlannerAuto(pathName);
+    System.out.println("=== Creating PathPlannerAuto: " + pathName + " ===");
+    try {
+      Command autoCommand = new PathPlannerAuto(pathName);
+      System.out.println("PathPlannerAuto created successfully: " + autoCommand.getName());
+      return autoCommand;
+    } catch (Exception e) {
+      System.err.println("ERROR creating PathPlannerAuto: " + e.getMessage());
+      e.printStackTrace();
+      return Commands.print("Auto path failed to load: " + pathName);
+    }
   }
 
   /**
+   * 
    * Use PathPlanner Path finding to go to a point on the field.
    *
    * @param pose Target {@link Pose2d} to go to.

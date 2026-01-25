@@ -31,13 +31,13 @@
     },
     "###/SmartDashboard/Command Selected": {
       "Collapsed": "0",
-      "Pos": "596,58",
+      "Pos": "591,63",
       "Size": "328,60"
     },
     "###/SmartDashboard/Field": {
       "Collapsed": "0",
-      "Pos": "279,93",
-      "Size": "1114,619"
+      "Pos": "309,189",
+      "Size": "1368,762"
     },
     "###FMS": {
       "Collapsed": "0",
@@ -46,8 +46,8 @@
     },
     "###Joysticks": {
       "Collapsed": "0",
-      "Pos": "576,715",
-      "Size": "976,82"
+      "Pos": "586,993",
+      "Size": "976,278"
     },
     "###Keyboard 0 Settings": {
       "Collapsed": "0",
@@ -77,12 +77,12 @@
     "###System Joysticks": {
       "Collapsed": "0",
       "Pos": "54,603",
-      "Size": "232,254"
+      "Size": "177,38"
     },
     "###Timing": {
       "Collapsed": "0",
       "Pos": "51,228",
-      "Size": "162,220"
+      "Size": "162,194"
     },
     "Debug##Default": {
       "Collapsed": "0",

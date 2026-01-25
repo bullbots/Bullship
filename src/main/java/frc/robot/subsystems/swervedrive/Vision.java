@@ -76,6 +76,14 @@ public class Vision {
    * Field from {@link swervelib.SwerveDrive#field}
    */
   private Field2d field2d;
+  /**
+   * Track whether we've seen an AprilTag and reset odometry yet
+   */
+  private boolean hasResetOdometryFromVision = false;
+  /**
+   * Track whether we've printed the waiting message
+   */
+  private boolean hasLoggedWaitingMessage = false;
 
   /**
    * Constructor for the Vision class.
@@ -126,7 +134,7 @@ public class Vision {
    * @param swerveDrive {@link SwerveDrive} instance.
    */
   public void updatePoseEstimation(SwerveDrive swerveDrive) {
-    if (SwerveDriveTelemetry.isSimulation && swerveDrive.getSimulationDriveTrainPose().isPresent()) {
+    if (SwerveDriveTelemetry.isSimulation) {
       /*
        * In the maple-sim, odometry is simulated using encoder values, accounting for
        * factors like skidding and drifting.
@@ -137,15 +145,54 @@ public class Vision {
        * Therefore, we must ensure that the actual robot pose is provided in the
        * simulator when updating the vision simulation during the simulation.
        */
-      visionSim.update(swerveDrive.getSimulationDriveTrainPose().get());
+      var simPose = swerveDrive.getSimulationDriveTrainPose();
+      if (simPose.isPresent()) {
+        visionSim.update(simPose.get());
+      } else {
+        // Fallback: use odometry pose for vision simulation if simulation pose isn't available
+        visionSim.update(swerveDrive.getPose());
+      }
     }
+
+    // Debug: Print waiting message only once
+    if (!hasResetOdometryFromVision && !hasLoggedWaitingMessage) {
+      System.out.println("[Vision Debug] Waiting for first AprilTag detection...");
+      hasLoggedWaitingMessage = true;
+    }
+
     for (Cameras camera : Cameras.values()) {
       Optional<EstimatedRobotPose> poseEst = getEstimatedGlobalPose(camera);
+      // Only log when pose is actually present to reduce console spam
       if (poseEst.isPresent()) {
         var pose = poseEst.get();
-        swerveDrive.addVisionMeasurement(pose.estimatedPose.toPose2d(),
-            pose.timestampSeconds,
-            camera.curStdDevs);
+        System.out.println("[Vision Debug] " + camera.name() + " - POSE PRESENT with " + pose.targetsUsed.size() + " targets");
+
+        // First time seeing a tag: reset odometry to immediately snap to correct position
+        if (!hasResetOdometryFromVision) {
+          var beforePose = swerveDrive.getPose();
+          System.out.println("[Vision Debug] FIRST TAG DETECTED by " + camera.name());
+          System.out.println("[Vision Debug] Current odometry BEFORE reset: X=" +
+                           String.format("%.2f", beforePose.getX()) + "m, Y=" +
+                           String.format("%.2f", beforePose.getY()) + "m, Rotation=" +
+                           String.format("%.2f", beforePose.getRotation().getDegrees()) + "°");
+          System.out.println("[Vision Debug] Forcing odometry to vision pose: X=" +
+                           String.format("%.2f", pose.estimatedPose.getX()) + "m, Y=" +
+                           String.format("%.2f", pose.estimatedPose.getY()) + "m, Rotation=" +
+                           String.format("%.2f", pose.estimatedPose.getRotation().toRotation2d().getDegrees()) + "°");
+          swerveDrive.resetOdometry(pose.estimatedPose.toPose2d());
+          var afterPose = swerveDrive.getPose();
+          System.out.println("[Vision Debug] Current odometry AFTER reset: X=" +
+                           String.format("%.2f", afterPose.getX()) + "m, Y=" +
+                           String.format("%.2f", afterPose.getY()) + "m, Rotation=" +
+                           String.format("%.2f", afterPose.getRotation().getDegrees()) + "°");
+          hasResetOdometryFromVision = true;
+          System.out.println("[Vision Debug] Now continuously updating odometry with vision measurements");
+        } else {
+          // Subsequent detections: blend vision with odometry using configured standard deviations
+          swerveDrive.addVisionMeasurement(pose.estimatedPose.toPose2d(),
+              pose.timestampSeconds,
+              camera.curStdDevs);
+        }
       }
     }
 
@@ -158,6 +205,7 @@ public class Vision {
    * <li>The generated pose estimate was considered not accurate</li>
    * </ul>
    *
+   * @param camera Camera to get pose estimate from
    * @return an {@link EstimatedRobotPose} with an estimated pose, timestamp, and
    *         targets used to create the estimate
    */
@@ -495,7 +543,12 @@ public class Vision {
       }
       if ((resultsList.isEmpty() || (currentTimestamp - mostRecentTimestamp >= debounceTime)) &&
           (currentTimestamp - lastReadTimestamp) >= debounceTime) {
-        resultsList = Robot.isReal() ? camera.getAllUnreadResults() : cameraSim.getCamera().getAllUnreadResults();
+        var newResults = Robot.isReal() ? camera.getAllUnreadResults() : cameraSim.getCamera().getAllUnreadResults();
+        // Only log when we get results or when debugging empty results
+        if (!newResults.isEmpty()) {
+          System.out.println("[Vision Debug] " + camera.getName() + " got " + newResults.size() + " results");
+        }
+        resultsList = newResults;
         lastReadTimestamp = currentTimestamp;
         resultsList.sort((PhotonPipelineResult a, PhotonPipelineResult b) -> {
           return a.getTimestampSeconds() >= b.getTimestampSeconds() ? 1 : -1;
@@ -523,7 +576,36 @@ public class Vision {
     private void updateEstimatedGlobalPose() {
       Optional<EstimatedRobotPose> visionEst = Optional.empty();
       for (var change : resultsList) {
+        // DETAILED DEBUG: Show raw PhotonPipelineResult data
+        System.out.println("[Vision Debug RAW] " + camera.getName() +
+                         " | hasTargets=" + change.hasTargets() +
+                         " | targetCount=" + change.getTargets().size() +
+                         " | timestamp=" + String.format("%.3f", change.getTimestampSeconds()) +
+                         " | multitagResult=" + (change.getMultiTagResult().isPresent() ? "PRESENT" : "EMPTY"));
+
+        // If we have targets, show details about each one
+        if (change.hasTargets()) {
+          for (var target : change.getTargets()) {
+            System.out.println("[Vision Debug RAW]   -> Target ID=" + target.getFiducialId() +
+                             " | yaw=" + String.format("%.1f", target.getYaw()) + "°" +
+                             " | pitch=" + String.format("%.1f", target.getPitch()) + "°" +
+                             " | area=" + String.format("%.2f", target.getArea()) + "%" +
+                             " | ambiguity=" + String.format("%.3f", target.getPoseAmbiguity()));
+          }
+        }
+
+        // The update() method uses the configured strategy (MULTI_TAG_PNP_ON_COPROCESSOR)
+        // with fallback to LOWEST_AMBIGUITY. This works without requiring a reference pose.
         visionEst = poseEstimator.update(change);
+
+        // Only log successful pose estimates
+        if (visionEst.isPresent()) {
+          System.out.println("[Vision Debug] " + camera.getName() + " CALCULATED POSE: X=" +
+                           String.format("%.2f", visionEst.get().estimatedPose.getX()) + "m, Y=" +
+                           String.format("%.2f", visionEst.get().estimatedPose.getY()) + "m, Rotation=" +
+                           String.format("%.2f", visionEst.get().estimatedPose.getRotation().toRotation2d().getDegrees()) + "°");
+        }
+
         updateEstimationStdDevs(visionEst, change.getTargets());
       }
       estimatedRobotPose = visionEst;
@@ -544,43 +626,18 @@ public class Vision {
         curStdDevs = singleTagStdDevs;
 
       } else {
-        // Pose present. Start running Heuristic
-        var estStdDevs = singleTagStdDevs;
-        int numTags = 0;
-        double avgDist = 0;
-
-        // Precalculation - see how many tags we found, and calculate an
-        // average-distance metric
-        for (var tgt : targets) {
-          var tagPose = poseEstimator.getFieldTags().getTagPose(tgt.getFiducialId());
-          if (tagPose.isEmpty()) {
-            continue;
-          }
-          numTags++;
-          avgDist += tagPose
-              .get()
-              .toPose2d()
-              .getTranslation()
-              .getDistance(estimatedPose.get().estimatedPose.toPose2d().getTranslation());
-        }
+        // Simplified: Accept all AprilTag detections with configured standard deviations
+        int numTags = targets.size();
 
         if (numTags == 0) {
           // No tags visible. Default to single-tag std devs
           curStdDevs = singleTagStdDevs;
+        } else if (numTags > 1) {
+          // Multiple tags - use multi-tag std devs (more trustworthy)
+          curStdDevs = multiTagStdDevs;
         } else {
-          // One or more tags visible, run the full heuristic.
-          avgDist /= numTags;
-          // Decrease std devs if multiple targets are visible
-          if (numTags > 1) {
-            estStdDevs = multiTagStdDevs;
-          }
-          // Increase std devs based on (average) distance
-          if (numTags == 1 && avgDist > 4) {
-            estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
-          } else {
-            estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
-          }
-          curStdDevs = estStdDevs;
+          // Single tag - use single-tag std devs
+          curStdDevs = singleTagStdDevs;
         }
       }
     }

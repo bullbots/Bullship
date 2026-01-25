@@ -32,15 +32,12 @@ import frc.robot.commands.Coral.SnortCoral;
 import frc.robot.commands.Coral.YeetCoral;
 import frc.robot.commands.Elevator.MoveElevatorToPos;
 import frc.robot.commands.Elevator.MoveElevatorToPosWithFinish;
-import frc.robot.commands.Lift.MoveLiftDown;
-import frc.robot.commands.Lift.MoveLiftUp;
 import frc.robot.commands.ControllerVibrate;
 import frc.robot.commands.StrafeAndMoveForward;
 import frc.robot.commands.swervedrive.SwervePathToAprilTagSupplier;
 import frc.robot.subsystems.AlgaeExtractor;
 import frc.robot.subsystems.Coral;
 import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.Lift;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import swervelib.SwerveInputStream;
 
@@ -66,8 +63,6 @@ public class RobotContainer {
   public static final DigitalInput coralSensor = new DigitalInput(0);
 
   public static final Coral coral = new Coral();
-
-  public static final Lift lift = new Lift();
 
   // public static final AlgaeExtractor algaeExtractor = new AlgaeExtractor();
   /**
@@ -207,8 +202,8 @@ public class RobotContainer {
         elevator.childSafetyEnabled = false;
       }));
       // Lift Buttons
-      buttonBox.button(11).whileTrue(new MoveLiftUp(lift));
-      buttonBox.button(5).whileTrue(new MoveLiftDown(lift));
+      //buttonBox.button(11).whileTrue(new MoveLiftUp(lift));
+      //buttonBox.button(5).whileTrue(new MoveLiftDown(lift));
 
       driverXbox.povRight().whileTrue(
           new ConditionalCommand(

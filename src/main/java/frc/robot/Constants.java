@@ -33,6 +33,11 @@ public final class Constants {
   public static final double MAX_SPEED = Units.feetToMeters(14.5);
   // Maximum speed of the robot in meters per second, used to limit acceleration.
 
+  // Robot dimensions (including bumpers) for field visualization
+  // These values match PathPlanner settings.json and actual measured dimensions
+  public static final double ROBOT_LENGTH_METERS = 0.9525; // 37.5 inches - Front to back with bumpers
+  public static final double ROBOT_WIDTH_METERS = 0.8382;  // 33 inches - Side to side with bumpers
+
   // IDs
   public final class Motors {
 
@@ -53,7 +58,8 @@ public final class Constants {
     public static final int ALGAE_MOTOR = 11;
     // motor removed
     // public static final int ALGAE_DOWN = 12;
-    public static final int LIFT_MOTOR = 13;
+    // Lift motor removed from robot
+    // public static final int LIFT_MOTOR = 13;
 
   }
 

@@ -71,6 +71,7 @@
       "/SmartDashboard/JSON": "Alerts",
       "/SmartDashboard/Motors": "Alerts",
       "/SmartDashboard/PathPlanner": "Alerts",
+      "/SmartDashboard/PhotonAlerts": "Alerts",
       "/SmartDashboard/Pigeon 2 (v6) [13]": "Gyro",
       "/SmartDashboard/Pigeon 2 [13]": "Gyro",
       "/SmartDashboard/SendableChooser[0]": "String Chooser",
@@ -116,12 +117,13 @@
           "arrowWeight": 3.0,
           "style": "Hidden"
         },
-        "bottom": 1914,
-        "height": 8.069275856018066,
-        "left": 245,
-        "right": 3942,
-        "top": 118,
-        "width": 16.54119300842285,
+        "bottom": 1638,
+        "builtin": "2025 Reefscape",
+        "height": 8.051901817321777,
+        "left": 534,
+        "right": 3466,
+        "top": 291,
+        "width": 17.54825210571289,
         "window": {
           "visible": true
         }

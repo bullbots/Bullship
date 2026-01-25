@@ -106,7 +106,10 @@ public class Robot extends TimedRobot
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null)
     {
+      System.out.println("=== AUTONOMOUS STARTING: " + m_autonomousCommand.getName() + " ===");
       m_autonomousCommand.schedule();
+    } else {
+      System.out.println("=== ERROR: No autonomous command selected! ===");
     }
   }
 
@@ -171,5 +174,7 @@ public class Robot extends TimedRobot
   @Override
   public void simulationPeriodic()
   {
+    // Subsystem simulationPeriodic methods are called automatically by CommandScheduler
+    // No additional code needed here for YAGSL simulation
   }
 }

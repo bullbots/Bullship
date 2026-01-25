@@ -54,6 +54,10 @@ public final class Autos {
     }
 
     public static Command getSelected() {
-        return commandChooser.getSelected();
+        Command selected = commandChooser.getSelected();
+        System.out.println("=== AUTOS.getSelected() called ===");
+        System.out.println("Selected command: " + (selected != null ? selected.getName() : "NULL"));
+        System.out.println("================================");
+        return selected;
     }
 }

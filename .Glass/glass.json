@@ -31,12 +31,37 @@
             "frontright": {
               "open": true
             }
-          },
-          "open": true
+          }
         }
       },
       "limelight-aprilta": {
         "double[]##v_/limelight-aprilta/botpose_wpiblue": {
+          "open": true
+        },
+        "open": true
+      },
+      "photonvision": {
+        "FrontLeftCamera": {
+          "Transform3d##v_/photonvision/FrontLeftCamera/targetPose": {
+            "Rotation3d##v_rotation": {
+              "open": true
+            },
+            "Translation3d##v_translation": {
+              "open": true
+            },
+            "open": true
+          },
+          "double[]##v_/photonvision/FrontLeftCamera/cameraDistortion": {
+            "open": true
+          },
+          "double[]##v_/photonvision/FrontLeftCamera/cameraIntrinsics": {
+            "open": true
+          }
+        },
+        "FrontRightCamera": {
+          "Transform3d##v_/photonvision/FrontRightCamera/targetPose": {
+            "open": true
+          },
           "open": true
         },
         "open": true
@@ -52,6 +77,8 @@
       "/SmartDashboard/JSON": "Alerts",
       "/SmartDashboard/Motors": "Alerts",
       "/SmartDashboard/PathPlanner": "Alerts",
+      "/SmartDashboard/PhotonAlerts": "Alerts",
+      "/SmartDashboard/Pigeon 2 (v6) [13]": "Gyro",
       "/SmartDashboard/Swerve Drive": "Alerts"
     },
     "windows": {
@@ -62,6 +89,7 @@
       },
       "/SmartDashboard/Field": {
         "bottom": 1638,
+        "builtin": "2025 Reefscape",
         "height": 8.051901817321777,
         "left": 534,
         "right": 3466,
