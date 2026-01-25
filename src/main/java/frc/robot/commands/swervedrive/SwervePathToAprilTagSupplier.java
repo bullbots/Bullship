@@ -4,7 +4,6 @@
 
 package frc.robot.commands.swervedrive;
 
-import java.lang.reflect.Constructor;
 import java.util.function.Supplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -16,8 +15,8 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
-import frc.robot.LimelightHelpers;
 import frc.robot.RobotContainer;
+import frc.robot.subsystems.swervedrive.Vision.Cameras;
 
 /** Add your docs here. */
 public class SwervePathToAprilTagSupplier implements Supplier<Command>{
@@ -52,14 +51,22 @@ public class SwervePathToAprilTagSupplier implements Supplier<Command>{
             constraints = new PathConstraints(
                     drivebase.getSwerveDrive().getMaximumChassisVelocity()*speed, 4.0,
                     drivebase.getSwerveDrive().getMaximumChassisAngularVelocity(), Units.degreesToRadians(720));
-            
-            // var targetPose = LimelightHelpers.getTargetPose_RobotSpace("limelight");
-            // var results = LimelightHelpers.getLatestResults("limelight");
-            // var fiducials = results.targets_Classifier;
+
+            // Get the best AprilTag ID from PhotonVision cameras
+            int id = -1;
+            for (Cameras camera : Cameras.values()) {
+                var result = camera.getLatestResult();
+                if (result.isPresent() && result.get().hasTargets()) {
+                    id = result.get().getBestTarget().getFiducialId();
+                    break;
+                }
+            }
+
+            if (id == -1) {
+                return new PrintCommand("No AprilTag ID found from PhotonVision!");
+            }
           
-            var id = LimelightHelpers.getFiducialID("limelight-aprilta");
-          
-            var aprilTagPose = drivebase.getAprilTagPose((int) id);
+            var aprilTagPose = drivebase.getAprilTagPose(id);
           
             Pose2d aprilTag2d = new Pose2d(aprilTagPose.get().getX(), aprilTagPose.get().getY(), aprilTagPose.get().getRotation().toRotation2d());
             

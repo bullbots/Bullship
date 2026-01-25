@@ -107,7 +107,7 @@ public class Robot extends TimedRobot
     if (m_autonomousCommand != null)
     {
       System.out.println("=== AUTONOMOUS STARTING: " + m_autonomousCommand.getName() + " ===");
-      m_autonomousCommand.schedule();
+      CommandScheduler.getInstance().schedule(m_autonomousCommand);
     } else {
       System.out.println("=== ERROR: No autonomous command selected! ===");
     }

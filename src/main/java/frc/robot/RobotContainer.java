@@ -249,7 +249,7 @@ public class RobotContainer {
       if (command.isScheduled()) {
         command.cancel();
       }
-      command.schedule();
+      CommandScheduler.getInstance().schedule(command);
     }));
   }
 

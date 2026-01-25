@@ -29,7 +29,6 @@ import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -41,16 +40,14 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import static edu.wpi.first.units.Units.Meter;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
-import frc.robot.LimelightHelpers;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.swervedrive.Vision.Cameras;
 import swervelib.SwerveController;
@@ -84,9 +81,6 @@ public class SwerveSubsystem extends SubsystemBase {
    */
   private Vision vision;
 
-  private boolean isInitialPoseSet = false;
-
-  private int limeLightRunner = 0;
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -178,84 +172,6 @@ public class SwerveSubsystem extends SubsystemBase {
 
     // Update field widget with robot pose
     swerveDrive.field.setRobotPose(getPose());
-
-    // LIMELIGHT CODE - DISABLED FOR PHOTONVISION
-    // if (!isInitialPoseSet) {
-
-    //   LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-aprilta");
-    //   if (mt1 == null) {
-    //     return;
-    //   }
-
-    //   if (mt1.tagCount >= 2) {
-    //     var estimatedPose = mt1.pose;
-    //     resetOdometry(estimatedPose);
-    //     isInitialPoseSet = true;
-    //   }
-
-    // } else {
-
-    //   limeLightRunner++;
-    //   if (limeLightRunner < 5) {
-    //     return;
-    //   }
-    //   limeLightRunner = 0;
-
-    //   // LimelightHelpers.SetRobotOrientation("limelight-aprilta",
-    //   //         swerveDrive.swerveDrivePoseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
-    //   LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-aprilta");
-
-    //   if (mt1 == null) {
-    //     return;
-    //   }
-
-    //   if (mt1.tagCount == 0) {
-    //     return;
-    //   }
-
-    //   if (mt1.tagCount >= 2) { // Let's use mt1 because it's better with two tags.
-
-    //     // LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-aprilta");
-    //     // This should not happen, but just in case.
-    //     // if (mt1 == null || mt1.tagCount < 2) {
-    //     //   return;
-    //     // }
-
-    //     swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.5,.5,9999999));
-    //     swerveDrive.swerveDrivePoseEstimator.addVisionMeasurement(
-    //             mt1.pose,
-    //             mt1.timestampSeconds);
-
-    //   } else {
-
-    //     var doRejectUpdate = false;
-    //     if(mt1.tagCount == 1 && mt1.rawFiducials.length == 1){
-
-    //       if(mt1.rawFiducials[0].ambiguity > .7)
-    //       {
-    //         doRejectUpdate = true;
-    //       }
-    //       if(mt1.rawFiducials[0].distToCamera > 3)
-    //       {
-    //         doRejectUpdate = true;
-    //       }
-
-    //       if(mt1.tagCount == 0)
-    //       {
-    //         doRejectUpdate = true;
-    //       }
-
-    //       if(!doRejectUpdate)
-    //       {
-    //         swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.5,.5,9999999));
-    //         swerveDrive.swerveDrivePoseEstimator.addVisionMeasurement(
-    //               mt1.pose,
-    //               mt1.timestampSeconds);
-    //       }
-    //     }
-
-    //   }
-    // }
   }
 
   @Override
@@ -326,7 +242,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
     // Preload PathPlanner Path finding
     // IF USING CUSTOM PATHFINDER ADD BEFORE THIS LINE
-    PathfindingCommand.warmupCommand().schedule();
+    CommandScheduler.getInstance().schedule(PathfindingCommand.warmupCommand());
   }
 
   /**
@@ -862,11 +778,14 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   public boolean seesAprilTag() {
-    LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-aprilta");
-    if (mt2 == null) {
-      return false;
+    // Check all PhotonVision cameras for AprilTag detections
+    for (Cameras camera : Cameras.values()) {
+      Optional<PhotonPipelineResult> result = camera.getLatestResult();
+      if (result.isPresent() && result.get().hasTargets()) {
+        return true;
+      }
     }
-    return mt2.tagCount != 0;
+    return false;
   }
 
   public Optional<Pose3d> getAprilTagPose(int ID) {

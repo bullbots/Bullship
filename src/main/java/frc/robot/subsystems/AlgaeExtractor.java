@@ -4,11 +4,11 @@
 
 package frc.robot.subsystems;
 
+import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.ResetMode;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
@@ -73,9 +73,9 @@ public class AlgaeExtractor extends SubsystemBase {
     config.closedLoop.maxMotion
         // Set MAXMotion parameters for position control. We don't need to pass
         // a closed loop slot, as it will default to slot 0.
-        .maxVelocity(1000)
+        .cruiseVelocity(1000)
         .maxAcceleration(1000)
-        .allowedClosedLoopError(0.01);
+        .allowedProfileError(0.01);
         // // Set MAXMotion parameters for velocity control in slot 1
         // .maxAcceleration(500, ClosedLoopSlot.kSlot1)
         // .maxVelocity(6000, ClosedLoopSlot.kSlot1)
@@ -96,14 +96,14 @@ public class AlgaeExtractor extends SubsystemBase {
   }
 
   public void moveArmsDown() {
-    closedLoopController.setReference(Constants.AlgeaSetPosition, ControlType.kMAXMotionPositionControl,
+    closedLoopController.setSetpoint(Constants.AlgeaSetPosition, ControlType.kMAXMotionPositionControl,
         ClosedLoopSlot.kSlot0);
     armsOut = true;
 
   }
 
   public void moveArmsUp() {
-    closedLoopController.setReference(0, ControlType.kMAXMotionPositionControl,
+    closedLoopController.setSetpoint(0, ControlType.kMAXMotionPositionControl,
         ClosedLoopSlot.kSlot0);
 
     armsOut = false;
@@ -111,7 +111,7 @@ public class AlgaeExtractor extends SubsystemBase {
   }
 
   public void barf() {
-    closedLoopController.setReference(Constants.AlgeaBarfPosition, ControlType.kMAXMotionPositionControl,
+    closedLoopController.setSetpoint(Constants.AlgeaBarfPosition, ControlType.kMAXMotionPositionControl,
         ClosedLoopSlot.kSlot0);
 
     armsOut = true;
@@ -119,7 +119,7 @@ public class AlgaeExtractor extends SubsystemBase {
   }
 
   public void moveArmsHold() {
-    closedLoopController.setReference(Constants.AlgeaHoldPosition, ControlType.kMAXMotionPositionControl,
+    closedLoopController.setSetpoint(Constants.AlgeaHoldPosition, ControlType.kMAXMotionPositionControl,
         ClosedLoopSlot.kSlot0);
 
     armsOut = true;

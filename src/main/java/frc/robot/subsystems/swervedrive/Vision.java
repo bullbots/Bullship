@@ -1,8 +1,5 @@
 package frc.robot.subsystems.swervedrive;
 
-import static edu.wpi.first.units.Units.Microseconds;
-import static edu.wpi.first.units.Units.Milliseconds;
-import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -18,7 +15,6 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.networktables.NetworkTablesJNI;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -32,7 +28,6 @@ import java.util.function.Supplier;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
-import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.PhotonUtils;
 import org.photonvision.simulation.PhotonCameraSim;
 import org.photonvision.simulation.SimCameraProperties;
@@ -106,6 +101,26 @@ public class Vision {
 
       openSimCameraViews();
     }
+
+    // Flush stale PhotonVision results that accumulated before robot code started
+    // This prevents reading old buffered data when robot code restarts
+    flushStaleResults();
+  }
+
+  /**
+   * Flush any stale results from PhotonVision cameras.
+   * Call this on startup to clear buffered data from before robot code started.
+   */
+  private void flushStaleResults() {
+    System.out.println("[Vision] Flushing stale PhotonVision results...");
+    for (Cameras camera : Cameras.values()) {
+      // Call getAllUnreadResults() to clear the buffer, discard the results
+      var staleResults = camera.camera.getAllUnreadResults();
+      System.out.println("[Vision] Flushed " + staleResults.size() + " stale results from " + camera.camera.getName());
+      // Also clear the camera's internal results list
+      camera.resultsList.clear();
+    }
+    System.out.println("[Vision] Stale results flushed, ready for fresh data");
   }
 
   /**
@@ -354,7 +369,7 @@ public class Vision {
   /**
    * Camera Enum to select each camera
    */
-  enum Cameras {
+  public enum Cameras {
     /**
      * Front Left Camera
      */
@@ -417,10 +432,6 @@ public class Vision {
      * queries.
      */
     public List<PhotonPipelineResult> resultsList = new ArrayList<>();
-    /**
-     * Last read from the camera timestamp to prevent lag due to slow data fetches.
-     */
-    private double lastReadTimestamp = Microseconds.of(NetworkTablesJNI.now()).in(Seconds);
 
     /**
      * Construct a Photon Camera class with help. Standard deviations are fake
@@ -446,10 +457,8 @@ public class Vision {
       // https://docs.wpilib.org/en/stable/docs/software/basic-programming/coordinate-system.html
       robotToCamTransform = new Transform3d(robotToCamTranslation, robotToCamRotation);
 
-      poseEstimator = new PhotonPoseEstimator(Vision.fieldLayout,
-          PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-          robotToCamTransform);
-      poseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+      // Use 2-argument constructor (PhotonVision 2026 API)
+      poseEstimator = new PhotonPoseEstimator(Vision.fieldLayout, robotToCamTransform);
 
       this.singleTagStdDevs = singleTagStdDevs;
       this.multiTagStdDevs = multiTagStdDevsMatrix;
@@ -531,31 +540,21 @@ public class Vision {
     }
 
     /**
-     * Update the latest results, cached with a maximum refresh rate of 1req/15ms.
-     * Sorts the list by timestamp.
+     * Update the latest results from the camera.
+     * Always polls to maintain PhotonVision TimeSync communication.
+     * Sorts the list by timestamp (newest first).
      */
     private void updateUnreadResults() {
-      double mostRecentTimestamp = resultsList.isEmpty() ? 0.0 : resultsList.get(0).getTimestampSeconds();
-      double currentTimestamp = Microseconds.of(NetworkTablesJNI.now()).in(Seconds);
-      double debounceTime = Milliseconds.of(15).in(Seconds);
-      for (PhotonPipelineResult result : resultsList) {
-        mostRecentTimestamp = Math.max(mostRecentTimestamp, result.getTimestampSeconds());
-      }
-      if ((resultsList.isEmpty() || (currentTimestamp - mostRecentTimestamp >= debounceTime)) &&
-          (currentTimestamp - lastReadTimestamp) >= debounceTime) {
-        var newResults = Robot.isReal() ? camera.getAllUnreadResults() : cameraSim.getCamera().getAllUnreadResults();
-        // Only log when we get results or when debugging empty results
-        if (!newResults.isEmpty()) {
-          System.out.println("[Vision Debug] " + camera.getName() + " got " + newResults.size() + " results");
-        }
-        resultsList = newResults;
-        lastReadTimestamp = currentTimestamp;
-        resultsList.sort((PhotonPipelineResult a, PhotonPipelineResult b) -> {
-          return a.getTimestampSeconds() >= b.getTimestampSeconds() ? 1 : -1;
-        });
-        if (!resultsList.isEmpty()) {
-          updateEstimatedGlobalPose();
-        }
+      // Always call getAllUnreadResults() to maintain TimeSync heartbeat with PhotonVision
+      resultsList = Robot.isReal() ? camera.getAllUnreadResults() : cameraSim.getCamera().getAllUnreadResults();
+
+      // Sort by timestamp descending (newest first) so index 0 is the latest result
+      resultsList.sort((PhotonPipelineResult a, PhotonPipelineResult b) -> {
+        return Double.compare(b.getTimestampSeconds(), a.getTimestampSeconds());
+      });
+
+      if (!resultsList.isEmpty()) {
+        updateEstimatedGlobalPose();
       }
     }
 
@@ -594,9 +593,14 @@ public class Vision {
           }
         }
 
-        // The update() method uses the configured strategy (MULTI_TAG_PNP_ON_COPROCESSOR)
-        // with fallback to LOWEST_AMBIGUITY. This works without requiring a reference pose.
-        visionEst = poseEstimator.update(change);
+        // PhotonVision 2026 API: Use individual estimation methods
+        // Try multi-tag coprocessor pose estimation first (most accurate with multiple tags)
+        visionEst = poseEstimator.estimateCoprocMultiTagPose(change);
+
+        // Fallback to lowest ambiguity single-tag estimation if multi-tag fails
+        if (visionEst.isEmpty()) {
+          visionEst = poseEstimator.estimateLowestAmbiguityPose(change);
+        }
 
         // Only log successful pose estimates
         if (visionEst.isPresent()) {

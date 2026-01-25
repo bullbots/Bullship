@@ -2,6 +2,7 @@ package frc.robot.commands.Coral;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.commands.ControllerVibrate;
 import frc.robot.subsystems.Coral;
 
@@ -31,7 +32,7 @@ public class YeetCoral extends Command {
     @Override
     public void end(boolean isFinished) {
         coral.stopCoral();
-        controllerVibrate.schedule();
+        CommandScheduler.getInstance().schedule(controllerVibrate);
         System.out.println("IntakeCoral.end()");
     }
 
