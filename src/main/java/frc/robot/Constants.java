@@ -96,26 +96,26 @@ public final class Constants {
 
     // Front Left Camera Transform (relative to robot center)
     public static final Translation3d FRONT_LEFT_CAMERA_POSITION = new Translation3d(
-        Units.inchesToMeters(12.056),  // X: forward from center
-        Units.inchesToMeters(10.981),  // Y: left from center
-        Units.inchesToMeters(8.44)     // Z: up from center
+        Units.inchesToMeters(14.5),  // X: forward from center
+        Units.inchesToMeters(11.5),  // Y: left from center
+        Units.inchesToMeters(9.25)     // Z: up from center
     );
     public static final Rotation3d FRONT_LEFT_CAMERA_ROTATION = new Rotation3d(
         0,                              // Roll (no tilt)
         0,                              // Pitch (horizontal, parallel to floor)
-        Math.toRadians(-24.15)          // Yaw (rotated 24.15° inward to the right)
+        Math.toRadians(-20.36)          // Yaw (rotated 24.15° inward to the right)
     );
 
     // Front Right Camera Transform (relative to robot center)
     public static final Translation3d FRONT_RIGHT_CAMERA_POSITION = new Translation3d(
-        Units.inchesToMeters(15.625),  // X: forward from center
-        Units.inchesToMeters(-11.375), // Y: right from center (negative)
-        Units.inchesToMeters(9)     // Z: up from center
+        Units.inchesToMeters(14.75),  // X: forward from center
+        Units.inchesToMeters(-11.25), // Y: right from center (negative)
+        Units.inchesToMeters(9.25)     // Z: up from center
     );
     public static final Rotation3d FRONT_RIGHT_CAMERA_ROTATION = new Rotation3d(
         0,                              // Roll (no tilt)
         0,                              // Pitch (horizontal, parallel to floor)
-        Math.toRadians(22.33)           // Yaw (rotated 22.33° inward to the left)
+        Math.toRadians(20.36)           // Yaw (rotated 22.33° inward to the left)
     );
 
     // Standard deviations for pose estimation
