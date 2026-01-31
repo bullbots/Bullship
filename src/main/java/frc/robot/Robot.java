@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
@@ -41,12 +44,16 @@ public class Robot extends TimedRobot
   @Override
   public void robotInit()
   {
+    // Start DataLog - logs will be saved to USB drive on RoboRIO
+    DataLogManager.start();
+    DriverStation.startDataLog(DataLogManager.getLog());
+
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
 
     // Create a timer to disable motor brake a few seconds after disable.  This will let the robot stop
-    // immediately when disabled, but then also let it be pushed more 
+    // immediately when disabled, but then also let it be pushed more
     disabledTimer = new Timer();
 
     if (isSimulation())

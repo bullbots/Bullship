@@ -12,6 +12,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -173,11 +174,9 @@ public class RobotContainer {
       driverXbox.leftBumper().onTrue(Commands.none());
       driverXbox.rightBumper().onTrue(Commands.none());
     } else {
-      // driverXbox.x().onTrue(new MoveElevator(elevator, 0));
-      // driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
-      // driverXbox.b().whileTrue(
-      // drivebase.driveToPose(
-      // new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0))));
+      // X button: Drive straight forward without gyro correction (for mechanical diagnosis)
+      driverXbox.x().whileTrue(
+          drivebase.drive(() -> new ChassisSpeeds(1, 0, 0)));
 
       driverXbox.start().onTrue((Commands.print("drivebase::zeroGyro").andThen(drivebase::zeroGyroWithAlliance)));
       driverXbox.back().whileTrue(Commands.none());
@@ -211,7 +210,9 @@ public class RobotContainer {
                   new DeferredCommand(new SwervePathToAprilTagSupplier(1.0, true, true), Set.of(drivebase)),
                   new ControllerVibrate(50)),
               new StrafeAndMoveForward(drivebase, driveStrafeRight),
-              drivebase::seesAprilTag));
+              drivebase::seesAprilTag)
+          .beforeStarting(() -> drivebase.logPovRightPressed(true))
+          .finallyDo(() -> drivebase.logPovRightPressed(false)));
 
       driverXbox.povLeft().whileTrue(
           new ConditionalCommand(

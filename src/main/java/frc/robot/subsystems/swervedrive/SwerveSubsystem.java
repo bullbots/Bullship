@@ -39,6 +39,8 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import static edu.wpi.first.units.Units.Meter;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -81,6 +83,32 @@ public class SwerveSubsystem extends SubsystemBase {
    */
   private Vision vision;
 
+  /**
+   * DataLog entries for module encoders and gyro
+   */
+  private DoubleLogEntry gyroYawLog;
+  private DoubleLogEntry[] modulePositionLogs;
+  private DoubleLogEntry[] moduleVelocityLogs;
+  private DoubleLogEntry[] moduleAngleLogs;
+
+  /**
+   * DataLog entries for AprilTag alignment testing
+   */
+  private edu.wpi.first.util.datalog.BooleanLogEntry aprilTagDetectedLog;
+  private edu.wpi.first.util.datalog.IntegerLogEntry aprilTagIdLog;
+  private DoubleLogEntry aprilTagDistanceLog;
+  private DoubleLogEntry targetPoseXLog;
+  private DoubleLogEntry targetPoseYLog;
+  private edu.wpi.first.util.datalog.BooleanLogEntry povRightPressedLog;
+  private DoubleLogEntry targetRotationLog;
+  private DoubleLogEntry currentRotationLog;
+
+  /**
+   * DataLog entries for robot odometry
+   */
+  private DoubleLogEntry odometryXLog;
+  private DoubleLogEntry odometryYLog;
+  private DoubleLogEntry odometryRotationLog;
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -139,6 +167,9 @@ public class SwerveSubsystem extends SubsystemBase {
     setupPathPlanner();
     // RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyroWithAlliance));
     RobotModeTriggers.teleop().onTrue(Commands.runOnce(()->{RobotContainer.elevator.childSafetyEnabled = true;}));
+
+    // Initialize DataLog entries for diagnostics
+    initializeDataLogging();
   }
 
   /**
@@ -162,6 +193,43 @@ public class SwerveSubsystem extends SubsystemBase {
     vision = new Vision(swerveDrive::getPose, swerveDrive.field);
   }
 
+  /**
+   * Initialize DataLog entries for module encoders and gyro
+   */
+  private void initializeDataLogging() {
+    var log = DataLogManager.getLog();
+
+    // Gyro logging
+    gyroYawLog = new DoubleLogEntry(log, "/swerve/gyro/yaw");
+
+    // Module logging (4 modules)
+    int numModules = swerveDrive.getModules().length;
+    modulePositionLogs = new DoubleLogEntry[numModules];
+    moduleVelocityLogs = new DoubleLogEntry[numModules];
+    moduleAngleLogs = new DoubleLogEntry[numModules];
+
+    for (int i = 0; i < numModules; i++) {
+      modulePositionLogs[i] = new DoubleLogEntry(log, "/swerve/module" + i + "/position");
+      moduleVelocityLogs[i] = new DoubleLogEntry(log, "/swerve/module" + i + "/velocity");
+      moduleAngleLogs[i] = new DoubleLogEntry(log, "/swerve/module" + i + "/angle");
+    }
+
+    // AprilTag alignment logging
+    aprilTagDetectedLog = new edu.wpi.first.util.datalog.BooleanLogEntry(log, "/apriltag/detected");
+    aprilTagIdLog = new edu.wpi.first.util.datalog.IntegerLogEntry(log, "/apriltag/id");
+    aprilTagDistanceLog = new DoubleLogEntry(log, "/apriltag/distance");
+    targetPoseXLog = new DoubleLogEntry(log, "/apriltag/robotRelativeX");
+    targetPoseYLog = new DoubleLogEntry(log, "/apriltag/robotRelativeY");
+    povRightPressedLog = new edu.wpi.first.util.datalog.BooleanLogEntry(log, "/test/povRightPressed");
+    targetRotationLog = new DoubleLogEntry(log, "/test/targetRotation");
+    currentRotationLog = new DoubleLogEntry(log, "/test/currentRotation");
+
+    // Odometry logging
+    odometryXLog = new DoubleLogEntry(log, "/odometry/x");
+    odometryYLog = new DoubleLogEntry(log, "/odometry/y");
+    odometryRotationLog = new DoubleLogEntry(log, "/odometry/rotation");
+  }
+
   @Override
   public void periodic() {
     // When vision is enabled we must manually update odometry in SwerveDrive
@@ -172,6 +240,92 @@ public class SwerveSubsystem extends SubsystemBase {
 
     // Update field widget with robot pose
     swerveDrive.field.setRobotPose(getPose());
+
+    // Log gyro and module data
+    logSwerveData();
+
+    // Log AprilTag detection data
+    logAprilTagData();
+  }
+
+  /**
+   * Log swerve drive module encoders and gyro to DataLog
+   */
+  private void logSwerveData() {
+    // Log gyro yaw
+    gyroYawLog.append(swerveDrive.getYaw().getDegrees());
+
+    // Log each module's position, velocity, and angle
+    var modules = swerveDrive.getModules();
+    for (int i = 0; i < modules.length; i++) {
+      var state = modules[i].getState();
+      modulePositionLogs[i].append(modules[i].getPosition().distanceMeters);
+      moduleVelocityLogs[i].append(state.speedMetersPerSecond);
+      moduleAngleLogs[i].append(state.angle.getDegrees());
+    }
+
+    // Log odometry (robot pose)
+    Pose2d pose = getPose();
+    odometryXLog.append(pose.getX());
+    odometryYLog.append(pose.getY());
+    odometryRotationLog.append(pose.getRotation().getDegrees());
+  }
+
+  /**
+   * Log AprilTag detection and alignment data to DataLog
+   */
+  private void logAprilTagData() {
+    boolean tagDetected = false;
+    int tagId = -1;
+    double distance = -1.0;
+    double robotRelativeX = -1.0;
+    double robotRelativeY = -1.0;
+
+    // Check all cameras for AprilTag detections
+    for (Cameras camera : Cameras.values()) {
+      // Use getAllUnreadResults() for PhotonVision 2026 API
+      var results = camera.camera.getAllUnreadResults();
+      if (results.isEmpty()) {
+        continue;
+      }
+      PhotonPipelineResult result = results.get(results.size() - 1); // Get most recent result
+
+      if (result.hasTargets()) {
+        tagDetected = true;
+        var bestTarget = result.getBestTarget();
+        tagId = bestTarget.getFiducialId();
+
+        // Calculate distance to tag
+        var targetTransform = bestTarget.getBestCameraToTarget();
+        distance = Math.sqrt(
+            targetTransform.getX() * targetTransform.getX() +
+            targetTransform.getY() * targetTransform.getY()
+        );
+
+        // Calculate robot-relative position of AprilTag
+        // Get tag pose in field coordinates
+        Optional<Pose3d> tagPose3d = aprilTagFieldLayout.getTagPose(tagId);
+        if (tagPose3d.isPresent()) {
+          Pose2d tagPoseField = tagPose3d.get().toPose2d();
+          Pose2d robotPose = getPose();
+
+          // Calculate tag position relative to robot
+          // Get tag pose in robot's reference frame
+          Pose2d tagRelativeToRobot = tagPoseField.relativeTo(robotPose);
+          robotRelativeX = tagRelativeToRobot.getX();
+          robotRelativeY = tagRelativeToRobot.getY();
+        }
+
+        break; // Use first camera with detection
+      }
+    }
+
+    // Log the data
+    aprilTagDetectedLog.append(tagDetected);
+    aprilTagIdLog.append(tagId);
+    aprilTagDistanceLog.append(distance);
+    targetPoseXLog.append(robotRelativeX);
+    targetPoseYLog.append(robotRelativeY);
   }
 
   @Override
@@ -787,6 +941,24 @@ public class SwerveSubsystem extends SubsystemBase {
       }
     }
     return false;
+  }
+
+  /**
+   * Log the state of the POV right button for test analysis
+   * @param pressed true if POV right is currently pressed
+   */
+  public void logPovRightPressed(boolean pressed) {
+    povRightPressedLog.append(pressed);
+  }
+
+  /**
+   * Log rotation data for AprilTag alignment debugging
+   * @param targetRotation the calculated target rotation for the path (in degrees)
+   * @param currentRotation the current robot rotation (in degrees)
+   */
+  public void logRotationData(double targetRotation, double currentRotation) {
+    targetRotationLog.append(targetRotation);
+    currentRotationLog.append(currentRotation);
   }
 
   public Optional<Pose3d> getAprilTagPose(int ID) {

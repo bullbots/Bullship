@@ -15,8 +15,10 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.Robot;
@@ -75,10 +77,13 @@ public class Vision {
    * Track whether we've seen an AprilTag and reset odometry yet
    */
   private boolean hasResetOdometryFromVision = false;
+
   /**
-   * Track whether we've printed the waiting message
+   * DataLog entries for vision-based odometry reset debugging
    */
-  private boolean hasLoggedWaitingMessage = false;
+  private DoubleLogEntry visionResetPoseXLog;
+  private DoubleLogEntry visionResetPoseYLog;
+  private DoubleLogEntry visionResetPoseRotationLog;
 
   /**
    * Constructor for the Vision class.
@@ -90,6 +95,12 @@ public class Vision {
   public Vision(Supplier<Pose2d> currentPose, Field2d field) {
     this.currentPose = currentPose;
     this.field2d = field;
+
+    // Initialize DataLog entries for vision pose debugging
+    var log = DataLogManager.getLog();
+    visionResetPoseXLog = new DoubleLogEntry(log, "/vision/resetPoseX");
+    visionResetPoseYLog = new DoubleLogEntry(log, "/vision/resetPoseY");
+    visionResetPoseRotationLog = new DoubleLogEntry(log, "/vision/resetPoseRotation");
 
     if (Robot.isSimulation()) {
       visionSim = new VisionSystemSim("Vision");
@@ -112,15 +123,12 @@ public class Vision {
    * Call this on startup to clear buffered data from before robot code started.
    */
   private void flushStaleResults() {
-    System.out.println("[Vision] Flushing stale PhotonVision results...");
     for (Cameras camera : Cameras.values()) {
       // Call getAllUnreadResults() to clear the buffer, discard the results
-      var staleResults = camera.camera.getAllUnreadResults();
-      System.out.println("[Vision] Flushed " + staleResults.size() + " stale results from " + camera.camera.getName());
+      camera.camera.getAllUnreadResults();
       // Also clear the camera's internal results list
       camera.resultsList.clear();
     }
-    System.out.println("[Vision] Stale results flushed, ready for fresh data");
   }
 
   /**
@@ -169,39 +177,22 @@ public class Vision {
       }
     }
 
-    // Debug: Print waiting message only once
-    if (!hasResetOdometryFromVision && !hasLoggedWaitingMessage) {
-      System.out.println("[Vision Debug] Waiting for first AprilTag detection...");
-      hasLoggedWaitingMessage = true;
-    }
-
     for (Cameras camera : Cameras.values()) {
       Optional<EstimatedRobotPose> poseEst = getEstimatedGlobalPose(camera);
-      // Only log when pose is actually present to reduce console spam
       if (poseEst.isPresent()) {
         var pose = poseEst.get();
-        System.out.println("[Vision Debug] " + camera.name() + " - POSE PRESENT with " + pose.targetsUsed.size() + " targets");
 
         // First time seeing a tag: reset odometry to immediately snap to correct position
         if (!hasResetOdometryFromVision) {
-          var beforePose = swerveDrive.getPose();
-          System.out.println("[Vision Debug] FIRST TAG DETECTED by " + camera.name());
-          System.out.println("[Vision Debug] Current odometry BEFORE reset: X=" +
-                           String.format("%.2f", beforePose.getX()) + "m, Y=" +
-                           String.format("%.2f", beforePose.getY()) + "m, Rotation=" +
-                           String.format("%.2f", beforePose.getRotation().getDegrees()) + "°");
-          System.out.println("[Vision Debug] Forcing odometry to vision pose: X=" +
-                           String.format("%.2f", pose.estimatedPose.getX()) + "m, Y=" +
-                           String.format("%.2f", pose.estimatedPose.getY()) + "m, Rotation=" +
-                           String.format("%.2f", pose.estimatedPose.getRotation().toRotation2d().getDegrees()) + "°");
-          swerveDrive.resetOdometry(pose.estimatedPose.toPose2d());
-          var afterPose = swerveDrive.getPose();
-          System.out.println("[Vision Debug] Current odometry AFTER reset: X=" +
-                           String.format("%.2f", afterPose.getX()) + "m, Y=" +
-                           String.format("%.2f", afterPose.getY()) + "m, Rotation=" +
-                           String.format("%.2f", afterPose.getRotation().getDegrees()) + "°");
+          Pose2d visionPose = pose.estimatedPose.toPose2d();
+
+          // Log the vision-estimated pose being used for odometry reset
+          visionResetPoseXLog.append(visionPose.getX());
+          visionResetPoseYLog.append(visionPose.getY());
+          visionResetPoseRotationLog.append(visionPose.getRotation().getDegrees());
+
+          swerveDrive.resetOdometry(visionPose);
           hasResetOdometryFromVision = true;
-          System.out.println("[Vision Debug] Now continuously updating odometry with vision measurements");
         } else {
           // Subsequent detections: blend vision with odometry using configured standard deviations
           swerveDrive.addVisionMeasurement(pose.estimatedPose.toPose2d(),
@@ -575,24 +566,6 @@ public class Vision {
     private void updateEstimatedGlobalPose() {
       Optional<EstimatedRobotPose> visionEst = Optional.empty();
       for (var change : resultsList) {
-        // DETAILED DEBUG: Show raw PhotonPipelineResult data
-        System.out.println("[Vision Debug RAW] " + camera.getName() +
-                         " | hasTargets=" + change.hasTargets() +
-                         " | targetCount=" + change.getTargets().size() +
-                         " | timestamp=" + String.format("%.3f", change.getTimestampSeconds()) +
-                         " | multitagResult=" + (change.getMultiTagResult().isPresent() ? "PRESENT" : "EMPTY"));
-
-        // If we have targets, show details about each one
-        if (change.hasTargets()) {
-          for (var target : change.getTargets()) {
-            System.out.println("[Vision Debug RAW]   -> Target ID=" + target.getFiducialId() +
-                             " | yaw=" + String.format("%.1f", target.getYaw()) + "°" +
-                             " | pitch=" + String.format("%.1f", target.getPitch()) + "°" +
-                             " | area=" + String.format("%.2f", target.getArea()) + "%" +
-                             " | ambiguity=" + String.format("%.3f", target.getPoseAmbiguity()));
-          }
-        }
-
         // PhotonVision 2026 API: Use individual estimation methods
         // Try multi-tag coprocessor pose estimation first (most accurate with multiple tags)
         visionEst = poseEstimator.estimateCoprocMultiTagPose(change);
@@ -600,14 +573,6 @@ public class Vision {
         // Fallback to lowest ambiguity single-tag estimation if multi-tag fails
         if (visionEst.isEmpty()) {
           visionEst = poseEstimator.estimateLowestAmbiguityPose(change);
-        }
-
-        // Only log successful pose estimates
-        if (visionEst.isPresent()) {
-          System.out.println("[Vision Debug] " + camera.getName() + " CALCULATED POSE: X=" +
-                           String.format("%.2f", visionEst.get().estimatedPose.getX()) + "m, Y=" +
-                           String.format("%.2f", visionEst.get().estimatedPose.getY()) + "m, Rotation=" +
-                           String.format("%.2f", visionEst.get().estimatedPose.getRotation().toRotation2d().getDegrees()) + "°");
         }
 
         updateEstimationStdDevs(visionEst, change.getTargets());
