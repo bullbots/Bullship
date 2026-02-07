@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(for file in *.json)",
+      "Bash(do sed -i 's/\"\"frcYear\"\": \"\"2025\"\"/\"\"frcYear\"\": \"\"2026\"\"/g' \"$file\")",
+      "Bash(done)",
+      "Bash(./gradlew deploy:*)",
+      "Bash(sort:*)",
+      "Bash(uniq:*)",
+      "Bash(curl:*)",
+      "Bash(ls:*)",
+      "Bash(./gradlew clean build:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git checkout:*)",
+      "Bash(git merge:*)",
+      "Bash(git branch:*)",
+      "Bash(if [ -f vendordeps/Studica-frc2026.json ])",
+      "Bash(then head -15 vendordeps/Studica-frc2026.json)",
+      "Bash(else echo \"File not found\")",
+      "Bash(fi)",
+      "Bash(./gradlew build)"
+    ]
+  }
+}
