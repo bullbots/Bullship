@@ -1,6 +1,24 @@
 {
   "NetworkTables": {
     "transitory": {
+      "BarDetector": {
+        "open": true
+      },
+      "CameraPublisher": {
+        "Color": {
+          "open": true
+        },
+        "Depth": {
+          "open": true,
+          "string[]##v_/CameraPublisher/Depth/streams": {
+            "open": true
+          }
+        },
+        "FrontRightCamera": {
+          "open": true
+        },
+        "open": true
+      },
       "SmartDashboard": {
         "Field": {
           "double[]##v_/SmartDashboard/Field/Robot": {
@@ -55,21 +73,13 @@
       "/SmartDashboard/Swerve Drive": "Alerts"
     },
     "windows": {
-      "/SmartDashboard/Command Selected": {
-        "window": {
-          "visible": true
-        }
-      },
       "/SmartDashboard/Field": {
         "bottom": 1638,
         "height": 8.051901817321777,
         "left": 534,
         "right": 3466,
         "top": 291,
-        "width": 17.54825210571289,
-        "window": {
-          "visible": true
-        }
+        "width": 17.54825210571289
       }
     }
   },
@@ -108,7 +118,10 @@
             }
           ]
         }
-      ]
+      ],
+      "window": {
+        "visible": false
+      }
     }
   }
 }
