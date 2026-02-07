@@ -34,13 +34,16 @@ import frc.robot.commands.Elevator.MoveElevatorToPos;
 import frc.robot.commands.Elevator.MoveElevatorToPosWithFinish;
 import frc.robot.commands.ControllerVibrate;
 import frc.robot.commands.StrafeAndMoveForward;
+import frc.robot.commands.swervedrive.DriveToDetectedRobot;
 import frc.robot.commands.swervedrive.SwervePathToAprilTagSupplier;
+import frc.robot.commands.swervedrive.SwervePathToDetectedRobotSupplier;
 import frc.robot.commands.swervedrive.drivebase.Shake;
 import frc.robot.commands.swervedrive.drivebase.SyncSimOdometry;
 import frc.robot.commands.swervedrive.drivebase.Tornado;
 import frc.robot.subsystems.AlgaeExtractor;
 import frc.robot.subsystems.Coral;
 import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.RobotDetector;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import swervelib.SwerveInputStream;
 
@@ -66,6 +69,8 @@ public class RobotContainer {
   public static final DigitalInput coralSensor = new DigitalInput(0);
 
   public static final Coral coral = new Coral();
+
+  public static final RobotDetector robotDetector = new RobotDetector();
 
   // public static final AlgaeExtractor algaeExtractor = new AlgaeExtractor();
   /**
@@ -178,7 +183,14 @@ public class RobotContainer {
       driverXbox.rightBumper().onTrue(Commands.none());
     } else {
       driverXbox.x().whileTrue(new Shake(drivebase));
-      driverXbox.povUp().whileTrue(new Tornado(drivebase));
+      // driverXbox.povUp().whileTrue(new Tornado(drivebase));
+      // Use direct PID drive command instead of pathfinding
+      driverXbox.povUp().whileTrue(
+          new ParallelDeadlineGroup(
+              new DriveToDetectedRobot(drivebase, robotDetector),
+              new ControllerVibrate(50)
+          )
+      );
       // driverXbox.b().whileTrue(
       // drivebase.driveToPose(
       // new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0))));
