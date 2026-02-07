@@ -53,12 +53,12 @@ public class SwervePathToAprilTagSupplier implements Supplier<Command>{
                     drivebase.getSwerveDrive().getMaximumChassisAngularVelocity(), Units.degreesToRadians(720));
 
             // Get the best AprilTag ID from PhotonVision cameras
-            // Use camera.getLatestResult() directly from PhotonCamera to get fresh data
+            // Use getAllUnreadResults() instead of deprecated getLatestResult()
             int id = -1;
             for (Cameras camera : Cameras.values()) {
-                var result = camera.camera.getLatestResult();
-                if (result.hasTargets()) {
-                    id = result.getBestTarget().getFiducialId();
+                var results = camera.camera.getAllUnreadResults();
+                if (!results.isEmpty() && results.get(0).hasTargets()) {
+                    id = results.get(0).getBestTarget().getFiducialId();
                     break;
                 }
             }

@@ -779,10 +779,10 @@ public class SwerveSubsystem extends SubsystemBase {
 
   public boolean seesAprilTag() {
     // Check all PhotonVision cameras for AprilTag detections
-    // Use camera.getLatestResult() directly from PhotonCamera instead of cached results
+    // Use getAllUnreadResults() instead of deprecated getLatestResult()
     for (Cameras camera : Cameras.values()) {
-      PhotonPipelineResult result = camera.camera.getLatestResult();
-      if (result.hasTargets()) {
+      var results = camera.camera.getAllUnreadResults();
+      if (!results.isEmpty() && results.get(0).hasTargets()) {
         return true;
       }
     }

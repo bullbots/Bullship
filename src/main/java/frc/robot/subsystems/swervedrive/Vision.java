@@ -460,9 +460,9 @@ public class Vision {
       robotToCamTransform = new Transform3d(robotToCamTranslation, robotToCamRotation);
 
       // PhotonVision 2026 API: Create pose estimator with field layout
+      // Strategy is now selected by calling specific estimation methods
       poseEstimator = new PhotonPoseEstimator(
           Vision.fieldLayout,
-          PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
           robotToCamTransform);
 
       this.singleTagStdDevs = singleTagStdDevs;
@@ -608,10 +608,10 @@ public class Vision {
       if (!resultsList.isEmpty()) {
         var latestResult = resultsList.get(0);
 
-        // PhotonVision 2026 API: update() method handles pose estimation strategy
-        // The pose estimator uses the strategy set in constructor (MULTI_TAG_PNP_ON_COPROCESSOR)
-        // and automatically falls back to single-tag if needed
-        visionEst = poseEstimator.update(latestResult);
+        // PhotonVision 2026 API: Use specific estimation method instead of deprecated update()
+        // estimateCoprocMultiTagPose() replaces MULTI_TAG_PNP_ON_COPROCESSOR strategy
+        // Automatically falls back to single-tag if multi-tag estimation fails
+        visionEst = poseEstimator.estimateCoprocMultiTagPose(latestResult);
 
         updateEstimationStdDevs(visionEst, latestResult.getTargets());
       }
