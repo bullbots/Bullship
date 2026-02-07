@@ -138,7 +138,12 @@ public class SwerveSubsystem extends SubsystemBase {
     }
     setupPathPlanner();
     // RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyroWithAlliance));
-    RobotModeTriggers.teleop().onTrue(Commands.runOnce(()->{RobotContainer.elevator.childSafetyEnabled = true;}));
+    RobotModeTriggers.teleop().onTrue(Commands.runOnce(()->{
+      RobotContainer.elevator.childSafetyEnabled = true;
+      if (visionDriveTest && vision != null) {
+        vision.resetVisionOdometryFlag();
+      }
+    }));
   }
 
   /**

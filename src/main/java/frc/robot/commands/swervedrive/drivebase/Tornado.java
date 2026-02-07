@@ -11,8 +11,8 @@ import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class Tornado extends Command {
   private final SwerveSubsystem swerve;
-  private final double driveSpeed = 5.0; // meters per second forward
-  private final double rotationSpeed = Math.PI * 10; // radians per second rotation
+  private final double driveSpeed = 2.0; // meters per second forward
+  private final double rotationSpeed = Math.PI * 2; // radians per second rotation
 
   /** Creates a new Tornado. */
   public Tornado(SwerveSubsystem swerve) {

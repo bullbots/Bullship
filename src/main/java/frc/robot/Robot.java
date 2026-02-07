@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import org.photonvision.timesync.TimeSyncSingleton;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to each mode, as
@@ -41,12 +42,23 @@ public class Robot extends TimedRobot
   @Override
   public void robotInit()
   {
+    // Start PhotonVision TimeSync server for camera synchronization
+    // This must be called before any PhotonCamera objects are created
+    if (isReal()) {
+      try {
+        TimeSyncSingleton.load();
+        System.out.println("[Robot] PhotonVision TimeSync server started successfully");
+      } catch (Exception e) {
+        System.err.println("[Robot] Failed to start PhotonVision TimeSync server: " + e.getMessage());
+      }
+    }
+
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
 
     // Create a timer to disable motor brake a few seconds after disable.  This will let the robot stop
-    // immediately when disabled, but then also let it be pushed more 
+    // immediately when disabled, but then also let it be pushed more
     disabledTimer = new Timer();
 
     if (isSimulation())

@@ -147,6 +147,40 @@ public class Vision {
   }
 
   /**
+   * Reset the vision odometry flag. Call this when starting teleop to ensure
+   * AprilTag detection can reset odometry.
+   */
+  public void resetVisionOdometryFlag() {
+    hasResetOdometryFromVision = false;
+    hasLoggedWaitingMessage = false;
+    System.out.println("[Vision] Reset odometry flag - ready to detect AprilTags");
+
+    // Print camera status for diagnostics
+    if (Robot.isReal()) {
+      printCameraStatus();
+    }
+  }
+
+  /**
+   * Print the status of all cameras for diagnostic purposes.
+   */
+  public void printCameraStatus() {
+    System.out.println("[Vision] Camera Status Check:");
+    for (Cameras camera : Cameras.values()) {
+      try {
+        boolean isConnected = camera.camera.isConnected();
+        System.out.println("  - " + camera.name() + ": " + (isConnected ? "CONNECTED" : "DISCONNECTED"));
+
+        if (!isConnected) {
+          System.err.println("    WARNING: " + camera.name() + " is not connected to PhotonVision!");
+        }
+      } catch (Exception e) {
+        System.err.println("  - " + camera.name() + ": ERROR checking connection - " + e.getMessage());
+      }
+    }
+  }
+
+  /**
    * Update the pose estimation inside of {@link SwerveDrive} with all of the
    * given poses.
    *
@@ -175,7 +209,7 @@ public class Vision {
 
     // Debug: Print waiting message only once
     if (!hasResetOdometryFromVision && !hasLoggedWaitingMessage) {
-
+      System.out.println("[Vision] Waiting for AprilTag detection to reset odometry...");
       hasLoggedWaitingMessage = true;
     }
 
@@ -198,6 +232,7 @@ public class Vision {
 
         // First time seeing a tag: reset odometry to immediately snap to correct position
         if (!hasResetOdometryFromVision) {
+          System.out.println("[Vision] First AprilTag detected! Resetting odometry to: " + pose.estimatedPose.toPose2d());
           swerveDrive.resetOdometry(pose.estimatedPose.toPose2d());
           hasResetOdometryFromVision = true;
         } else {
@@ -582,6 +617,7 @@ public class Vision {
         }
       } catch (Exception e) {
         // Gracefully handle any PhotonVision communication errors
+        System.err.println("[Vision/" + name() + "] Error getting camera results: " + e.getMessage());
         resultsList = new ArrayList<>();
       }
     }
@@ -608,12 +644,21 @@ public class Vision {
       if (!resultsList.isEmpty()) {
         var latestResult = resultsList.get(0);
 
-        // PhotonVision 2026 API: Use specific estimation method instead of deprecated update()
-        // estimateCoprocMultiTagPose() replaces MULTI_TAG_PNP_ON_COPROCESSOR strategy
-        // Automatically falls back to single-tag if multi-tag estimation fails
-        visionEst = poseEstimator.estimateCoprocMultiTagPose(latestResult);
+        // Check if we have any targets before attempting pose estimation
+        if (latestResult.hasTargets()) {
+          try {
+            // PhotonVision 2026 API: Use estimateLowestAmbiguityPose() for robotside pose calculation
+            // This selects the pose estimate with lowest ambiguity (most reliable)
+            // Works with single or multiple tags without needing camera calibration matrices
+            visionEst = poseEstimator.estimateLowestAmbiguityPose(latestResult);
+          } catch (Exception e) {
+            // Handle pose estimation errors gracefully
+            System.err.println("[Vision/" + name() + "] Error estimating pose: " + e.getMessage());
+            visionEst = Optional.empty();
+          }
 
-        updateEstimationStdDevs(visionEst, latestResult.getTargets());
+          updateEstimationStdDevs(visionEst, latestResult.getTargets());
+        }
       }
 
       estimatedRobotPose = visionEst;
