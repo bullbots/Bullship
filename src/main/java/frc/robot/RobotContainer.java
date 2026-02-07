@@ -35,6 +35,9 @@ import frc.robot.commands.Elevator.MoveElevatorToPosWithFinish;
 import frc.robot.commands.ControllerVibrate;
 import frc.robot.commands.StrafeAndMoveForward;
 import frc.robot.commands.swervedrive.SwervePathToAprilTagSupplier;
+import frc.robot.commands.swervedrive.drivebase.Shake;
+import frc.robot.commands.swervedrive.drivebase.SyncSimOdometry;
+import frc.robot.commands.swervedrive.drivebase.Tornado;
 import frc.robot.subsystems.AlgaeExtractor;
 import frc.robot.subsystems.Coral;
 import frc.robot.subsystems.Elevator;
@@ -74,7 +77,7 @@ public class RobotContainer {
       () -> driverXbox.getLeftX() * -1)
       .withControllerRotationAxis(() -> driverXbox.getRightX() * -1)
       .deadband(OperatorConstants.DEADBAND)
-      .scaleTranslation(0.8)
+      .scaleTranslation(1.0)
       .allianceRelativeControl(true);
 
   /**
@@ -160,6 +163,7 @@ public class RobotContainer {
           Rotation2d.fromDegrees(90));
       driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
       driverXbox.button(1).whileTrue(drivebase.sysIdDriveMotorCommand());
+      driverXbox.povDown().onTrue(new SyncSimOdometry(drivebase));
     }
 
     if (DriverStation.isTest()) {
@@ -173,8 +177,8 @@ public class RobotContainer {
       driverXbox.leftBumper().onTrue(Commands.none());
       driverXbox.rightBumper().onTrue(Commands.none());
     } else {
-      // driverXbox.x().onTrue(new MoveElevator(elevator, 0));
-      // driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
+      driverXbox.x().whileTrue(new Shake(drivebase));
+      driverXbox.povUp().whileTrue(new Tornado(drivebase));
       // driverXbox.b().whileTrue(
       // drivebase.driveToPose(
       // new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0))));
@@ -233,10 +237,10 @@ public class RobotContainer {
 
 
       // Coral levels
-      setResetCommandLevelButton(0, 4);
-      setResetCommandLevelButton(1, 3);
-      setResetCommandLevelButton(2, 2);
-      setResetCommandLevelButton(3, 1);
+      setResetCommandLevelButton(0, 7);
+      setResetCommandLevelButton(1, 6);
+      setResetCommandLevelButton(2, 10);
+      setResetCommandLevelButton(3, 11);
       // Algae levels
       // setResetCommandLevelButton(4, 5);
       // setResetCommandLevelButton(5, 11);

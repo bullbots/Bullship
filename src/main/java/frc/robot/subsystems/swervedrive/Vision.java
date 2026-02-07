@@ -1,10 +1,8 @@
 package frc.robot.subsystems.swervedrive;
 
-
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -14,10 +12,10 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.Robot;
 import java.awt.Desktop;
@@ -92,14 +90,20 @@ public class Vision {
     this.field2d = field;
 
     if (Robot.isSimulation()) {
-      visionSim = new VisionSystemSim("Vision");
-      visionSim.addAprilTags(fieldLayout);
+      try {
+        visionSim = new VisionSystemSim("Vision");
+        visionSim.addAprilTags(fieldLayout);
 
-      for (Cameras c : Cameras.values()) {
-        c.addToVisionSim(visionSim);
+        for (Cameras c : Cameras.values()) {
+          c.addToVisionSim(visionSim);
+        }
+
+        openSimCameraViews();
+      } catch (Exception e) {
+        System.err.println("Warning: PhotonVision simulation initialization failed: " + e.getMessage());
+        System.err.println("Vision simulation will be disabled, but real robot functionality is unaffected.");
+        visionSim = null;
       }
-
-      openSimCameraViews();
     }
 
     // Flush stale PhotonVision results that accumulated before robot code started
@@ -112,15 +116,15 @@ public class Vision {
    * Call this on startup to clear buffered data from before robot code started.
    */
   private void flushStaleResults() {
-    System.out.println("[Vision] Flushing stale PhotonVision results...");
+
     for (Cameras camera : Cameras.values()) {
       // Call getAllUnreadResults() to clear the buffer, discard the results
       var staleResults = camera.camera.getAllUnreadResults();
-      System.out.println("[Vision] Flushed " + staleResults.size() + " stale results from " + camera.camera.getName());
+
       // Also clear the camera's internal results list
       camera.resultsList.clear();
     }
-    System.out.println("[Vision] Stale results flushed, ready for fresh data");
+
   }
 
   /**
@@ -149,59 +153,53 @@ public class Vision {
    * @param swerveDrive {@link SwerveDrive} instance.
    */
   public void updatePoseEstimation(SwerveDrive swerveDrive) {
-    if (SwerveDriveTelemetry.isSimulation) {
+    if (SwerveDriveTelemetry.isSimulation && visionSim != null) {
       /*
-       * In the maple-sim, odometry is simulated using encoder values, accounting for
-       * factors like skidding and drifting.
-       * As a result, the odometry may not always be 100% accurate.
-       * However, the vision system should be able to provide a reasonably accurate
-       * pose estimation, even when odometry is incorrect.
-       * (This is why teams implement vision system to correct odometry.)
-       * Therefore, we must ensure that the actual robot pose is provided in the
-       * simulator when updating the vision simulation during the simulation.
+       * In simulation, update vision simulation with the true robot pose.
+       * Don't force-reset odometry as it disrupts velocity calculations.
        */
-      var simPose = swerveDrive.getSimulationDriveTrainPose();
-      if (simPose.isPresent()) {
-        visionSim.update(simPose.get());
-      } else {
-        // Fallback: use odometry pose for vision simulation if simulation pose isn't available
-        visionSim.update(swerveDrive.getPose());
+      try {
+        var simPose = swerveDrive.getSimulationDriveTrainPose();
+        if (simPose.isPresent()) {
+          // Update vision simulation with the true pose
+          visionSim.update(simPose.get());
+        } else {
+          // Fallback: use odometry pose for vision simulation if simulation pose isn't
+          // available
+          visionSim.update(swerveDrive.getPose());
+        }
+      } catch (Exception e) {
+        // Silently ignore simulation errors to prevent spam
       }
     }
 
     // Debug: Print waiting message only once
     if (!hasResetOdometryFromVision && !hasLoggedWaitingMessage) {
-      System.out.println("[Vision Debug] Waiting for first AprilTag detection...");
+
       hasLoggedWaitingMessage = true;
     }
 
+    // In simulation, disable vision odometry corrections entirely
+    // Simulated wheel encoders are perfectly accurate, vision just adds instability
+    // Vision estimates are still calculated and visible in Glass for debugging
+    if (Robot.isSimulation()) {
+      for (Cameras camera : Cameras.values()) {
+        getEstimatedGlobalPose(camera); // Calculate for visualization only
+      }
+      return; // Don't apply any vision measurements to odometry
+    }
+
+    // Real robot: Apply vision corrections normally
     for (Cameras camera : Cameras.values()) {
       Optional<EstimatedRobotPose> poseEst = getEstimatedGlobalPose(camera);
       // Only log when pose is actually present to reduce console spam
       if (poseEst.isPresent()) {
         var pose = poseEst.get();
-        System.out.println("[Vision Debug] " + camera.name() + " - POSE PRESENT with " + pose.targetsUsed.size() + " targets");
 
         // First time seeing a tag: reset odometry to immediately snap to correct position
         if (!hasResetOdometryFromVision) {
-          var beforePose = swerveDrive.getPose();
-          System.out.println("[Vision Debug] FIRST TAG DETECTED by " + camera.name());
-          System.out.println("[Vision Debug] Current odometry BEFORE reset: X=" +
-                           String.format("%.2f", beforePose.getX()) + "m, Y=" +
-                           String.format("%.2f", beforePose.getY()) + "m, Rotation=" +
-                           String.format("%.2f", beforePose.getRotation().getDegrees()) + "°");
-          System.out.println("[Vision Debug] Forcing odometry to vision pose: X=" +
-                           String.format("%.2f", pose.estimatedPose.getX()) + "m, Y=" +
-                           String.format("%.2f", pose.estimatedPose.getY()) + "m, Rotation=" +
-                           String.format("%.2f", pose.estimatedPose.getRotation().toRotation2d().getDegrees()) + "°");
           swerveDrive.resetOdometry(pose.estimatedPose.toPose2d());
-          var afterPose = swerveDrive.getPose();
-          System.out.println("[Vision Debug] Current odometry AFTER reset: X=" +
-                           String.format("%.2f", afterPose.getX()) + "m, Y=" +
-                           String.format("%.2f", afterPose.getY()) + "m, Rotation=" +
-                           String.format("%.2f", afterPose.getRotation().getDegrees()) + "°");
           hasResetOdometryFromVision = true;
-          System.out.println("[Vision Debug] Now continuously updating odometry with vision measurements");
         } else {
           // Subsequent detections: blend vision with odometry using configured standard deviations
           swerveDrive.addVisionMeasurement(pose.estimatedPose.toPose2d(),
@@ -226,16 +224,20 @@ public class Vision {
    */
   public Optional<EstimatedRobotPose> getEstimatedGlobalPose(Cameras camera) {
     Optional<EstimatedRobotPose> poseEst = camera.getEstimatedGlobalPose();
-    if (Robot.isSimulation()) {
-      Field2d debugField = visionSim.getDebugField();
-      // Uncomment to enable outputting of vision targets in sim.
-      poseEst.ifPresentOrElse(
-          est -> debugField
-              .getObject("VisionEstimation")
-              .setPose(est.estimatedPose.toPose2d()),
-          () -> {
-            debugField.getObject("VisionEstimation").setPoses();
-          });
+    if (Robot.isSimulation() && visionSim != null) {
+      try {
+        Field2d debugField = visionSim.getDebugField();
+        // Uncomment to enable outputting of vision targets in sim.
+        poseEst.ifPresentOrElse(
+            est -> debugField
+                .getObject("VisionEstimation")
+                .setPose(est.estimatedPose.toPose2d()),
+            () -> {
+              debugField.getObject("VisionEstimation").setPoses();
+            });
+      } catch (Exception e) {
+        // Silently ignore simulation errors
+      }
     }
     return poseEst;
   }
@@ -457,26 +459,35 @@ public class Vision {
       // https://docs.wpilib.org/en/stable/docs/software/basic-programming/coordinate-system.html
       robotToCamTransform = new Transform3d(robotToCamTranslation, robotToCamRotation);
 
-      // Use 2-argument constructor (PhotonVision 2026 API)
-      poseEstimator = new PhotonPoseEstimator(Vision.fieldLayout, robotToCamTransform);
+      // PhotonVision 2026 API: Create pose estimator with field layout
+      poseEstimator = new PhotonPoseEstimator(
+          Vision.fieldLayout,
+          PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+          robotToCamTransform);
 
       this.singleTagStdDevs = singleTagStdDevs;
       this.multiTagStdDevs = multiTagStdDevsMatrix;
 
       if (Robot.isSimulation()) {
-        SimCameraProperties cameraProp = new SimCameraProperties();
-        // Arducam OV9281 - 640x480 @ 100 FPS with estimated 90 degree diagonal FOV
-        cameraProp.setCalibration(640, 480, Rotation2d.fromDegrees(90));
-        // Approximate detection noise matching calibration error (avg ~41px from your config)
-        cameraProp.setCalibError(0.35, 0.10);
-        // Set the camera image capture framerate to match actual cameras
-        cameraProp.setFPS(100);
-        // The average and standard deviation in milliseconds of image data latency.
-        cameraProp.setAvgLatencyMs(35);
-        cameraProp.setLatencyStdDevMs(5);
+        try {
+          SimCameraProperties cameraProp = new SimCameraProperties();
+          // Arducam OV9281 - 640x480 @ 100 FPS with estimated 90 degree diagonal FOV
+          cameraProp.setCalibration(640, 480, Rotation2d.fromDegrees(90));
+          // Approximate detection noise matching calibration error (avg ~41px from your
+          // config)
+          cameraProp.setCalibError(0.35, 0.10);
+          // Set the camera image capture framerate to match actual cameras
+          cameraProp.setFPS(100);
+          // The average and standard deviation in milliseconds of image data latency.
+          cameraProp.setAvgLatencyMs(35);
+          cameraProp.setLatencyStdDevMs(5);
 
-        cameraSim = new PhotonCameraSim(camera, cameraProp);
-        cameraSim.enableDrawWireframe(true);
+          cameraSim = new PhotonCameraSim(camera, cameraProp);
+          cameraSim.enableDrawWireframe(true);
+        } catch (Exception e) {
+          System.err.println("Warning: PhotonCameraSim initialization failed for " + name + ": " + e.getMessage());
+          cameraSim = null;
+        }
       }
     }
 
@@ -486,8 +497,12 @@ public class Vision {
      * @param systemSim {@link VisionSystemSim} to use.
      */
     public void addToVisionSim(VisionSystemSim systemSim) {
-      if (Robot.isSimulation()) {
-        systemSim.addCamera(cameraSim, robotToCamTransform);
+      if (Robot.isSimulation() && cameraSim != null) {
+        try {
+          systemSim.addCamera(cameraSim, robotToCamTransform);
+        } catch (Exception e) {
+          System.err.println("Warning: Failed to add camera to VisionSystemSim: " + e.getMessage());
+        }
       }
     }
 
@@ -545,16 +560,29 @@ public class Vision {
      * Sorts the list by timestamp (newest first).
      */
     private void updateUnreadResults() {
-      // Always call getAllUnreadResults() to maintain TimeSync heartbeat with PhotonVision
-      resultsList = Robot.isReal() ? camera.getAllUnreadResults() : cameraSim.getCamera().getAllUnreadResults();
+      // Always call getAllUnreadResults() to maintain TimeSync heartbeat with
+      // PhotonVision
+      try {
+        if (Robot.isReal()) {
+          resultsList = camera.getAllUnreadResults();
+        } else if (cameraSim != null) {
+          resultsList = cameraSim.getCamera().getAllUnreadResults();
+        } else {
+          // Simulation camera failed to initialize, use empty list
+          resultsList = new ArrayList<>();
+        }
 
-      // Sort by timestamp descending (newest first) so index 0 is the latest result
-      resultsList.sort((PhotonPipelineResult a, PhotonPipelineResult b) -> {
-        return Double.compare(b.getTimestampSeconds(), a.getTimestampSeconds());
-      });
+        // Sort by timestamp descending (newest first) so index 0 is the latest result
+        resultsList.sort((PhotonPipelineResult a, PhotonPipelineResult b) -> {
+          return Double.compare(b.getTimestampSeconds(), a.getTimestampSeconds());
+        });
 
-      if (!resultsList.isEmpty()) {
-        updateEstimatedGlobalPose();
+        if (!resultsList.isEmpty()) {
+          updateEstimatedGlobalPose();
+        }
+      } catch (Exception e) {
+        // Gracefully handle any PhotonVision communication errors
+        resultsList = new ArrayList<>();
       }
     }
 
@@ -574,44 +602,20 @@ public class Vision {
      */
     private void updateEstimatedGlobalPose() {
       Optional<EstimatedRobotPose> visionEst = Optional.empty();
-      for (var change : resultsList) {
-        // DETAILED DEBUG: Show raw PhotonPipelineResult data
-        System.out.println("[Vision Debug RAW] " + camera.getName() +
-                         " | hasTargets=" + change.hasTargets() +
-                         " | targetCount=" + change.getTargets().size() +
-                         " | timestamp=" + String.format("%.3f", change.getTimestampSeconds()) +
-                         " | multitagResult=" + (change.getMultiTagResult().isPresent() ? "PRESENT" : "EMPTY"));
 
-        // If we have targets, show details about each one
-        if (change.hasTargets()) {
-          for (var target : change.getTargets()) {
-            System.out.println("[Vision Debug RAW]   -> Target ID=" + target.getFiducialId() +
-                             " | yaw=" + String.format("%.1f", target.getYaw()) + "°" +
-                             " | pitch=" + String.format("%.1f", target.getPitch()) + "°" +
-                             " | area=" + String.format("%.2f", target.getArea()) + "%" +
-                             " | ambiguity=" + String.format("%.3f", target.getPoseAmbiguity()));
-          }
-        }
+      // Only process the LATEST result (index 0) since resultsList is sorted newest-first
+      // Processing all buffered results can cause erratic odometry updates in simulation
+      if (!resultsList.isEmpty()) {
+        var latestResult = resultsList.get(0);
 
-        // PhotonVision 2026 API: Use individual estimation methods
-        // Try multi-tag coprocessor pose estimation first (most accurate with multiple tags)
-        visionEst = poseEstimator.estimateCoprocMultiTagPose(change);
+        // PhotonVision 2026 API: update() method handles pose estimation strategy
+        // The pose estimator uses the strategy set in constructor (MULTI_TAG_PNP_ON_COPROCESSOR)
+        // and automatically falls back to single-tag if needed
+        visionEst = poseEstimator.update(latestResult);
 
-        // Fallback to lowest ambiguity single-tag estimation if multi-tag fails
-        if (visionEst.isEmpty()) {
-          visionEst = poseEstimator.estimateLowestAmbiguityPose(change);
-        }
-
-        // Only log successful pose estimates
-        if (visionEst.isPresent()) {
-          System.out.println("[Vision Debug] " + camera.getName() + " CALCULATED POSE: X=" +
-                           String.format("%.2f", visionEst.get().estimatedPose.getX()) + "m, Y=" +
-                           String.format("%.2f", visionEst.get().estimatedPose.getY()) + "m, Rotation=" +
-                           String.format("%.2f", visionEst.get().estimatedPose.getRotation().toRotation2d().getDegrees()) + "°");
-        }
-
-        updateEstimationStdDevs(visionEst, change.getTargets());
+        updateEstimationStdDevs(visionEst, latestResult.getTargets());
       }
+
       estimatedRobotPose = visionEst;
     }
 
@@ -630,7 +634,8 @@ public class Vision {
         curStdDevs = singleTagStdDevs;
 
       } else {
-        // Simplified: Accept all AprilTag detections with configured standard deviations
+        // Simplified: Accept all AprilTag detections with configured standard
+        // deviations
         int numTags = targets.size();
 
         if (numTags == 0) {
@@ -643,6 +648,7 @@ public class Vision {
           // Single tag - use single-tag std devs
           curStdDevs = singleTagStdDevs;
         }
+
       }
     }
 

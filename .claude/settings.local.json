@@ -21,7 +21,8 @@
       "Bash(ls:*)",
       "Bash(git add:*)",
       "Bash(git commit -m \"$\\(cat <<''EOF''\nUpdate PhotonVision pose estimation and downgrade PhotonLib to v2025.3.1\n\nVision system changes:\n- Downgraded PhotonLib from v2026.0.1-beta to v2025.3.1 to match PhotonVision version on Raspberry Pi\n- Removed setReferencePose\\(\\) calls \\(deprecated in newer versions\\)\n- Updated pose estimation to use direct update\\(\\) method with MULTI_TAG_PNP_ON_COPROCESSOR strategy\n- Added comprehensive debug logging to track target detection and pose calculation\n- Implemented first-tag detection logic to reset odometry on initial AprilTag sighting\n- Configured to continuously update odometry with vision measurements after first detection\n\nOther changes:\n- Removed Lift subsystem and related commands \\(no longer used\\)\n- Updated PathPlanner auto configurations\n- Various simulation and Glass configuration updates\n\nKnown issue: PhotonVision v2025.3.1 with 3D mode enabled may not publish individual target data.\nNext step: Test disabling 3D mode or upgrade PhotonVision to v2026 for better target publishing.\n\nCo-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(git stash:*)"
     ]
   }
 }
