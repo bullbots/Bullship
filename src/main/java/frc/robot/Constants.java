@@ -4,7 +4,13 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import swervelib.math.Matter;
 
@@ -75,5 +81,31 @@ public final class Constants {
 
     public static final int kDriverControllerPort = 0;
     public static final int kCopilotControllerPort = 1;
+  }
+
+  public static class VisionConstants {
+
+    // Camera names (must match PhotonVision configuration)
+    public static final String FRONT_LEFT_CAMERA_NAME = "Front_Left";
+    public static final String FRONT_RIGHT_CAMERA_NAME = "Front_Right";
+
+    // Camera positions and rotations relative to robot center
+    // These are example values - adjust based on your actual robot measurements
+    public static final Translation3d FRONT_LEFT_CAMERA_POSITION = new Translation3d(
+        Units.inchesToMeters(10), Units.inchesToMeters(10), Units.inchesToMeters(8));
+
+    public static final Rotation3d FRONT_LEFT_CAMERA_ROTATION = new Rotation3d(0, Math.toRadians(-20),
+        Math.toRadians(30));
+
+    public static final Translation3d FRONT_RIGHT_CAMERA_POSITION = new Translation3d(
+        Units.inchesToMeters(10), Units.inchesToMeters(-10), Units.inchesToMeters(8));
+
+    public static final Rotation3d FRONT_RIGHT_CAMERA_ROTATION = new Rotation3d(0, Math.toRadians(-20),
+        Math.toRadians(-30));
+
+    // Standard deviations for vision measurements
+    // [x, y, theta] - lower values = trust vision more
+    public static final Matrix<N3, N1> SINGLE_TAG_STD_DEVS = VecBuilder.fill(4, 4, 8);
+    public static final Matrix<N3, N1> MULTI_TAG_STD_DEVS = VecBuilder.fill(0.5, 0.5, 1);
   }
 }
