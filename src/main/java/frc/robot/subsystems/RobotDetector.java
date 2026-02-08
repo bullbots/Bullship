@@ -203,13 +203,10 @@ public class RobotDetector extends SubsystemBase {
         // Convert camera frame to robot frame
         // Camera frame (from NetworkTables): X=right+, Y=down+, Z=forward+
         // Robot frame (WPILib): X=forward+, Y=left+, Z=up+
-        // User reports: -X in camera feed = +Y robot axis
-        // This means: Camera -X (left in view) = Robot +Y (left)
-        //            Camera +X (right in view) = Robot -Y (right)
         // Camera Z (depth/forward) -> Robot X (forward)
-        // Camera -X (left in view) -> Robot +Y (left), so: robot_y = cam_x (NOT negated)
+        // Camera X (right) -> Robot -Y (right), since Robot +Y is left
         double robot_x = cam_z;
-        double robot_y = cam_x;  // Changed from -cam_x
+        double robot_y = -cam_x;
 
         // Create translation in robot frame
         Translation2d robotFrameTranslation = new Translation2d(robot_x, robot_y);

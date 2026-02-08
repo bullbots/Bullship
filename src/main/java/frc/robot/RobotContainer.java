@@ -119,6 +119,9 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+    // Set initial pose to middle of field for testing (field is ~16.54m x 8.05m)
+    drivebase.resetOdometry(new Pose2d(8.27, 4.0, new Rotation2d()));
+
     // Configure the trigger bindings
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
@@ -183,14 +186,6 @@ public class RobotContainer {
       driverXbox.rightBumper().onTrue(Commands.none());
     } else {
       driverXbox.x().whileTrue(new Shake(drivebase));
-      // driverXbox.povUp().whileTrue(new Tornado(drivebase));
-      // Use direct PID drive command instead of pathfinding
-      driverXbox.povUp().whileTrue(
-          new ParallelDeadlineGroup(
-              new DriveToDetectedRobot(drivebase, robotDetector),
-              new ControllerVibrate(50)
-          )
-      );
       // driverXbox.b().whileTrue(
       // drivebase.driveToPose(
       // new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0))));
@@ -236,6 +231,21 @@ public class RobotContainer {
                   new ControllerVibrate(50)),
               new StrafeAndMoveForward(drivebase, driveStrafeLeft),
               drivebase::seesAprilTag));
+
+      // Path to detected opponent robot (1m offset, facing robot)
+      driverXbox.povUp().whileTrue(
+          new ConditionalCommand(
+              new ParallelDeadlineGroup(
+                  new DeferredCommand(new SwervePathToDetectedRobotSupplier(1.0, true), Set.of(drivebase)),
+                  new ControllerVibrate(50)),
+              Commands.none(),
+              () -> {
+                  boolean healthy = robotDetector.isHealthy();
+                  double[] pos = robotDetector.getClosestOpponentRobotCameraPosition();
+                  boolean hasOpponent = pos != null;
+                  System.out.printf("POV UP condition: healthy=%b, hasOpponent=%b%n", healthy, hasOpponent);
+                  return healthy && hasOpponent;
+              }));
 
       driverXbox.a()
           .whileTrue(new ParallelDeadlineGroup(

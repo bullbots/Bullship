@@ -11,9 +11,10 @@ import com.pathplanner.lib.path.PathConstraints;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import frc.robot.RobotContainer;
@@ -22,24 +23,33 @@ import frc.robot.subsystems.RobotDetector;
 /**
  * Command supplier that generates a path to track a detected opponent robot.
  * Uses the RealSense robot detector running on the coprocessor to identify
- * opponent robots and generates a dynamic path to maintain a specific distance.
+ * opponent robots and generates a dynamic path to approach them.
  *
- * Similar to SwervePathToAprilTagSupplier but:
- * - Uses X offset only (no Y offset)
- * - Targets opponent alliance robots
- * - Maintains 6 feet (~1.83m) distance
+ * Target pose is calculated along the straight line from the detected robot
+ * toward our current position, at a configurable offset distance, facing
+ * the detected robot (y offset = 0 in target frame).
  */
 public class SwervePathToDetectedRobotSupplier implements Supplier<Command> {
 
     private boolean isSlow;
     private double speed = 0.35;
-    private static final double X_OFFSET_METERS = 1.8288; // 6 feet in meters
+    private double offsetMeters;
+
+    // Telemetry publishers for visualizing target poses
+    private static final StructPublisher<Pose2d> targetPosePublisher =
+        NetworkTableInstance.getDefault()
+            .getStructTopic("RobotDetector/targetPose", Pose2d.struct).publish();
+    private static final StructPublisher<Pose2d> detectedRobotPosePublisher =
+        NetworkTableInstance.getDefault()
+            .getStructTopic("RobotDetector/detectedRobotPose", Pose2d.struct).publish();
 
     /**
      * Creates a new robot tracking command supplier.
+     * @param offsetMeters Distance to stop from the detected robot (along the line toward us)
      * @param isSlow if true, uses slower speed (0.2 instead of 0.35)
      */
-    public SwervePathToDetectedRobotSupplier(boolean isSlow) {
+    public SwervePathToDetectedRobotSupplier(double offsetMeters, boolean isSlow) {
+        this.offsetMeters = offsetMeters;
         this.isSlow = isSlow;
     }
 
@@ -96,35 +106,36 @@ public class SwervePathToDetectedRobotSupplier implements Supplier<Command> {
             cameraYaw
         );
 
-        System.out.printf("Detected robot (field frame): x=%.2f, y=%.2f, rot=%.1f°%n",
-            detectedRobotPose.getX(), detectedRobotPose.getY(), detectedRobotPose.getRotation().getDegrees());
+        Translation2d detectedRobotTranslation = detectedRobotPose.getTranslation();
+        Translation2d ourTranslation = currentPose.getTranslation();
 
-        // Apply transformation similar to AprilTag tracking
-        // Key difference: Y offset is 0 (no lateral offset)
+        System.out.printf("Detected robot (field frame): x=%.2f, y=%.2f%n",
+            detectedRobotTranslation.getX(), detectedRobotTranslation.getY());
 
-        // Step 1: Rotate around detected robot center
-        Pose2d convertedRobot2d = detectedRobotPose.rotateAround(
-            detectedRobotPose.getTranslation(),
-            detectedRobotPose.getRotation()
-        );
+        // Calculate vector from detected robot to our current position
+        Translation2d robotToUs = ourTranslation.minus(detectedRobotTranslation);
+        double distance = robotToUs.getNorm();
 
-        // Step 2: Apply X-only offset (6 feet forward, 0 lateral)
-        Pose2d convertedRobot2d2 = convertedRobot2d.transformBy(
-            new Transform2d(X_OFFSET_METERS, 0.0, new Rotation2d(0))
-        );
+        if (distance < 0.1) {
+            System.out.println("Already at detected robot position!");
+            return new PrintCommand("Already at detected robot position!");
+        }
 
-        // Step 3: Rotate back to field frame
-        Pose2d convertedRobotPose = convertedRobot2d2.rotateAround(
-            detectedRobotPose.getTranslation(),
-            detectedRobotPose.getRotation().times(-1)
-        );
+        // Normalize the vector and scale by offset distance
+        // This gives us a point along the straight line from detected robot toward us
+        Translation2d offsetVector = robotToUs.div(distance).times(offsetMeters);
+        Translation2d targetTranslation = detectedRobotTranslation.plus(offsetVector);
 
-        // Step 4: Face toward the detected robot (180° rotation)
-        Pose2d finalPose = new Pose2d(
-            convertedRobotPose.getX(),
-            convertedRobotPose.getY(),
-            convertedRobotPose.getRotation().rotateBy(Rotation2d.fromDegrees(180))
-        );
+        // Calculate rotation to face the detected robot
+        // Vector from target position to detected robot
+        Translation2d targetToRobot = detectedRobotTranslation.minus(targetTranslation);
+        Rotation2d facingRotation = new Rotation2d(targetToRobot.getX(), targetToRobot.getY());
+
+        Pose2d finalPose = new Pose2d(targetTranslation, facingRotation);
+
+        // Publish poses for field visualization
+        detectedRobotPosePublisher.set(detectedRobotPose);
+        targetPosePublisher.set(finalPose);
 
         System.out.printf("Current pose: x=%.2f, y=%.2f, rot=%.1f°%n",
             currentPose.getX(), currentPose.getY(), currentPose.getRotation().getDegrees());
@@ -132,8 +143,8 @@ public class SwervePathToDetectedRobotSupplier implements Supplier<Command> {
             finalPose.getX(), finalPose.getY(), finalPose.getRotation().getDegrees());
 
         // Calculate distance to target
-        double distance = currentPose.getTranslation().getDistance(finalPose.getTranslation());
-        System.out.printf("Distance to target: %.2f meters%n", distance);
+        double distanceToTarget = currentPose.getTranslation().getDistance(finalPose.getTranslation());
+        System.out.printf("Distance to target: %.2f meters%n", distanceToTarget);
 
         // Set speed based on slow mode
         if (isSlow) {
@@ -151,10 +162,9 @@ public class SwervePathToDetectedRobotSupplier implements Supplier<Command> {
         System.out.printf("Max velocity: %.2f m/s, Speed multiplier: %.2f%n",
             drivebase.getSwerveDrive().getMaximumChassisVelocity(), speed);
 
-        // Try using drivebase.driveToPose() instead of AutoBuilder
-        // This should work even if PathPlanner pathfinding has issues
-        System.out.println("Using drivebase.driveToPose() method");
-        Command pathCommand = drivebase.driveToPose(finalPose);
+        // Use AutoBuilder.pathfindToPose for pathfinding with constraints
+        System.out.println("Using AutoBuilder.pathfindToPose() method");
+        Command pathCommand = AutoBuilder.pathfindToPose(finalPose, constraints);
         System.out.printf("Generated path command: %s%n", pathCommand.getName());
         return pathCommand;
     }
