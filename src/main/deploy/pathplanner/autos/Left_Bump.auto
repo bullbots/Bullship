@@ -5,33 +5,27 @@
     "data": {
       "commands": [
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "FirstReefRight"
+            "pathName": "MoveFromHub"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "GoToFourthLevel"
+            "name": "GoOverBump"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "YeetCoral"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "GoToBottomLevel"
+            "name": "GoBackOverBump"
           }
         }
       ]
     }
   },
-  "resetOdom": false,
-  "folder": "Reefscape Autos",
+  "resetOdom": true,
+  "folder": null,
   "choreoAuto": false
 }

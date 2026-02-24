@@ -32,6 +32,8 @@ import frc.robot.commands.Coral.SnortCoral;
 import frc.robot.commands.Coral.YeetCoral;
 import frc.robot.commands.Elevator.MoveElevatorToPos;
 import frc.robot.commands.Elevator.MoveElevatorToPosWithFinish;
+import frc.robot.commands.RebuiltAutos.GoBackOverBump;
+import frc.robot.commands.RebuiltAutos.GoOverBump;
 import frc.robot.commands.ControllerVibrate;
 import frc.robot.commands.StrafeAndMoveForward;
 import frc.robot.commands.swervedrive.SwervePathToAprilTagSupplier;
@@ -131,6 +133,8 @@ public class RobotContainer {
     NamedCommands.registerCommand("RunIntake", new IntakeCoral(coral, coralSensor));
     NamedCommands.registerCommand("FirstReefLeft",
         new DeferredCommand(new SwervePathToAprilTagSupplier(-1.0, false, true), Set.of(drivebase)));
+    NamedCommands.registerCommand("GoOverBump", new GoOverBump(2.5, drivebase));
+    NamedCommands.registerCommand("GoBackOverBump", new GoBackOverBump(3.5, drivebase));
     Autos.load();
 
   }

@@ -32,6 +32,6 @@
     }
   },
   "resetOdom": false,
-  "folder": null,
+  "folder": "Reefscape Autos",
   "choreoAuto": false
 }

@@ -50,6 +50,9 @@ public final class Autos {
         commandChooser.addOption("1 Reef Right",
                 RobotContainer.drivebase.getAutonomousCommand("Right_Reef_1"));  
 
+        commandChooser.addOption("Bump Left",
+                RobotContainer.drivebase.getAutonomousCommand("Left_Bump"));
+
         SmartDashboard.putData("Command Selected", commandChooser);
     }
 

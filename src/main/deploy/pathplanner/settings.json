@@ -2,8 +2,12 @@
   "robotWidth": 0.8382,
   "robotLength": 0.9525,
   "holonomicMode": true,
-  "pathFolders": [],
-  "autoFolders": [],
+  "pathFolders": [
+    "Reefscape"
+  ],
+  "autoFolders": [
+    "Reefscape Autos"
+  ],
   "defaultMaxVel": 4.42,
   "defaultMaxAccel": 4.42,
   "defaultMaxAngVel": 540.0,
